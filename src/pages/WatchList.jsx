@@ -27,7 +27,7 @@ const WatchList = () => {
         if (user) {
             fetchData();
         }
-    }, [user]);
+    }, [user, fetchWatchlist]);
 
     if (loading) {
         return (

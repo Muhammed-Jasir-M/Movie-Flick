@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import axiosInstance from '../services/axios';
 import PosterCard from './PosterCard';
 import Spinner from './Spinner';
@@ -9,7 +9,7 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const fetchByCategory = async () => {
+    const fetchByCategory = useCallback(async () => {
         setLoading(true);
         try {
             const response = await axiosInstance.get(`${endpoint}`);
@@ -19,9 +19,9 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [endpoint]);
 
-    const fetchByGenreId = async () => {
+    const fetchByGenreId = useCallback(async () => {
         setLoading(true);
         try {
             const response = await axiosInstance.get(`/discover/${type}`, {
@@ -36,7 +36,7 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [genreId, type]);
 
     useEffect(() => {
         if (genreId) {
@@ -44,7 +44,7 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
         } else {
             fetchByCategory();
         }
-    }, [endpoint, genreId]);
+    }, [genreId, fetchByCategory, fetchByGenreId]);
 
     const sliderRef = useRef(null)
 

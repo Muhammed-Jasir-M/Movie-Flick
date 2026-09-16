@@ -16,7 +16,7 @@ const ExplorePage = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [loadingMore, setLoadingMore] = useState(false);
 
-    const fetchByCategory = async () => {
+    const fetchByCategory = useCallback(async () => {
         if (page > 1 && page <= totalPages) {
             setLoadingMore(true);
         } else {
@@ -39,9 +39,9 @@ const ExplorePage = () => {
             setLoading(false);
             setLoadingMore(false);
         }
-    };
+    }, [endpoint, page, totalPages]);
 
-    const fetchByGenreId = async () => {
+    const fetchByGenreId = useCallback(async () => {
         if (page > 1) {
             setLoadingMore(true);
         } else {
@@ -66,26 +66,13 @@ const ExplorePage = () => {
             setLoading(false);
             setLoadingMore(false);
         }
-    };
+    }, [genreId, page, type]);
 
-    const throttle = (func, delay) => {
-        let lastCall = 0;
-        return function (...args) {
-            const now = new Date().getTime();
-            if (now - lastCall < delay) {
-                return;
-            }
-            lastCall = now;
-            return func(...args);
-        };
-    };
-
-    const handleScroll = useCallback(throttle(() => {
+    const handleScroll = useCallback(() => {
         if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight && page < totalPages) {
             setPage((prev) => prev + 1);
         }
-
-    }, 0), [page, totalPages]);
+    }, [page, totalPages]);
 
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
@@ -101,7 +88,7 @@ const ExplorePage = () => {
         } else {
             fetchByCategory();
         }
-    }, [endpoint, genreId, page, type]);
+    }, [genreId, fetchByCategory, fetchByGenreId]);
 
     return (
         <section className='container mx-auto min-h-[800px] md:min-h-screen flex justify-center items-center'>

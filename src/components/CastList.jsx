@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import axiosInstance from '../services/axios';
 import { useParams } from 'react-router-dom';
 import { getImageUrl } from '../constants/constants';
@@ -12,7 +12,7 @@ const CastList = () => {
 
     const { type, id } = useParams();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
 
         try {
@@ -28,11 +28,11 @@ const CastList = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, type]);
 
     useEffect(() => {
         fetchData();
-    }, [type, id]);
+    }, [fetchData]);
 
     return (
         <section className='px-1'>

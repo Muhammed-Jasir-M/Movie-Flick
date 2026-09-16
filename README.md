@@ -31,7 +31,7 @@ A feature-rich web application built with **React**, **Tailwind CSS**, **Firebas
 
 ### Prerequisites
 
-Make sure you have Node.js (v14+ recommended) and `npm` or `yarn` installed on your system.
+Make sure you have Node.js (v14+ recommended) and `yarn` installed on your system.
 
 ### 1. Clone the Repository
 
@@ -43,8 +43,6 @@ cd Movie-Flick
 ### 2. Install Dependencies
 
 ```bash
-npm install
-# or
 yarn install
 ```
 
@@ -62,8 +60,6 @@ REACT_APP_TMDB_API_KEY=your_tmdb_read_access_token_or_api_key
 Start the local development server:
 
 ```bash
-npm start
-# or
 yarn start
 ```
 
@@ -96,7 +92,7 @@ Movie-Flick/
 
 In the project directory, you can run:
 
-- `npm start` – Runs the app in development mode.
-- `npm run build` – Builds the app for production in the `build` folder.
-- `npm test` – Launches the test runner.
+- `yarn start` – Runs the app in development mode.
+- `yarn build` – Builds the app for production in the `build` folder.
+- `yarn test` – Launches the test runner.
 

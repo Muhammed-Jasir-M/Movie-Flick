@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import axiosInstance from '../services/axios';
 import { Link, useParams } from 'react-router-dom';
 import { getImageUrl } from '../constants/constants';
@@ -23,7 +23,7 @@ const DetailsInfo = () => {
 
     const runtime = mediaData?.runtime || mediaData?.last_episode_to_air?.runtime || mediaData?.episode_run_time?.[0];
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
 
         try {
@@ -34,11 +34,11 @@ const DetailsInfo = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, type]);
 
     useEffect(() => {
         fetchData();
-    }, [type, id]);
+    }, [fetchData]);
 
     useEffect(() => {
         const checkWatchlistStatus = async () => {
@@ -50,7 +50,7 @@ const DetailsInfo = () => {
         if (user && mediaData.id) {
             checkWatchlistStatus();
         }
-    }, [user, mediaData.id]);
+    }, [user, mediaData.id, fetchWatchlist]);
 
     const handleClick = async () => {
         setLoading(true);

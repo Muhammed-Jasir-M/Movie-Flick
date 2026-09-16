@@ -14,7 +14,7 @@ const SearchPage = () => {
 
     const searchTimer = useRef(null);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         if (page > 1) {
             setLoadingMore(true);
         } else {
@@ -46,26 +46,13 @@ const SearchPage = () => {
             setLoading(false);
             setLoadingMore(false);
         }
-    };
+    }, [activeTab, page, search]);
 
-    const throttle = (func, delay) => {
-        let lastCall = 0;
-        return function (...args) {
-            const now = new Date().getTime();
-            if (now - lastCall < delay) {
-                return;
-            }
-            lastCall = now;
-            return func(...args);
-        };
-    };
-
-    const handleScroll = useCallback(throttle(() => {
+    const handleScroll = useCallback(() => {
         if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight  && page < totalPages) {
             setPage((prev) => prev + 1);
         }
-
-    }, 50), [page, totalPages]);
+    }, [page, totalPages]);
 
     useEffect(() => {
         if (search.trim().length > 0) {
@@ -75,7 +62,7 @@ const SearchPage = () => {
             setPage(1);
             setTotalPages(0);
         }
-    }, [search, page, activeTab]);
+    }, [search, fetchData]);
 
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import axiosInstance from '../services/axios';
 import Spinner from '../components/Spinner';
@@ -17,7 +17,7 @@ const PlayerPage = () => {
 
     const { id, type } = useParams();
 
-    const fetchVideos = async () => {
+    const fetchVideos = useCallback(async () => {
         setLoading(true);
         try {
             const response = await axiosInstance.get(`${type}/${id}/videos`);
@@ -40,11 +40,11 @@ const PlayerPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, type]);
 
     useEffect(() => {
         fetchVideos();
-    }, [type, id]);
+    }, [fetchVideos]);
 
     if (loading) {
         return (
