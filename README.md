@@ -1,70 +1,102 @@
-# Getting Started with Create React App
+# 🎬 Movie Flick
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A feature-rich web application built with **React**, **Tailwind CSS**, **Firebase**, and **TMDB (The Movie Database) API**. Movie Flick offers users a modern, responsive streaming UI experience where they can discover trending movies and TV shows, watch trailers, manage watchlist items, and authenticate securely.
 
-## Available Scripts
+---
+
+## ✨ Features
+
+- 🔐 **User Authentication**: Secure Login & Sign Up powered by Firebase Auth (with Formik & Yup validation).
+- 🍿 **Explore & Discover**: Browse trending, popular, top-rated movies and TV shows.
+- 🔍 **Search**: Fast real-time search functionality for titles, cast, and genres.
+- 🎬 **Trailer & Video Player**: Embedded media player for watching trailers directly on the site.
+- 🔖 **Watchlist**: Save your favorite movies and TV shows to view later.
+- 📱 **Responsive Design**: Modern, glassmorphism-inspired UI designed using Tailwind CSS & Swiper slider.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React 18, React Router DOM v6
+- **Styling**: Tailwind CSS, PostCSS, React Icons
+- **State Management / Data Fetching**: Axios, React Context / State
+- **Form Handling**: Formik, Yup
+- **Backend Services**: Firebase (Authentication & Database)
+- **API Source**: TMDB (The Movie Database API)
+- **UI Components & Utilities**: Swiper.js, React Toastify, Moment.js
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Make sure you have Node.js (v14+ recommended) and `npm` or `yarn` installed on your system.
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Muhammed-Jasir-M/Movie-Flick.git
+cd Movie-Flick
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+```
+
+### 3. Environment Setup
+
+Create a `.env` file in the root directory of your project and configure your Firebase and TMDB API keys:
+
+```env
+REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
+REACT_APP_TMDB_API_KEY=your_tmdb_read_access_token_or_api_key
+```
+
+### 4. Run the Application
+
+Start the local development server:
+
+```bash
+npm start
+# or
+yarn start
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the app.
+
+---
+
+## 📂 Project Structure
+
+```text
+Movie-Flick/
+├── public/              # Static public assets
+├── src/
+│   ├── components/      # Reusable UI components (Navbar, Cards, Slider, etc.)
+│   ├── constants/       # App constants and configuration files
+│   ├── pages/           # Page routes (Home, Explore, Details, Profile, WatchList, etc.)
+│   ├── services/        # API request services & Firebase configuration
+│   ├── store/           # Global state / context providers
+│   ├── App.js           # Main routing & application wrapper
+│   └── index.js         # Entry point
+├── .env                 # Environment variables
+├── package.json         # Project dependencies and scripts
+├── tailwind.config.js   # Tailwind CSS configuration
+└── README.md            # Project documentation
+```
+
+---
+
+## 📜 Available Scripts
 
 In the project directory, you can run:
 
-### `yarn start`
+- `npm start` – Runs the app in development mode.
+- `npm run build` – Builds the app for production in the `build` folder.
+- `npm test` – Launches the test runner.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
