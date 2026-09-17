@@ -8,16 +8,13 @@ const DetailsPage = () => {
     const { type, id } = useParams();
 
     return (
-        <section className=''>
+        <section className="bg-[#0f172a] min-h-screen pb-12">
             <DetailsInfo />
             <CastList />
-
-            <div className='pb-5'>
-                <CardsList endpoint={`/${type}/${id}/similar`} title={`Similar ${type === 'movie' ? 'Movies' : 'Tv Shows'}`} type={`${type}`} />
-                <CardsList endpoint={`/${type}/${id}/recommendations`} title={`Recommented  ${type === 'movie' ? 'Movies' : 'Tv Shows'}`} type={`${type}`} />
-            </div>
+            <CardsList endpoint={`/${type}/${id}/similar`} title={`Similar ${type === 'movie' ? 'Movies' : 'TV Shows'}`} type={`${type}`} />
+            <CardsList endpoint={`/${type}/${id}/recommendations`} title={`Recommended ${type === 'movie' ? 'Movies' : 'TV Shows'}`} type={`${type}`} />
         </section>
-    )
-}
+    );
+};
 
 export default DetailsPage

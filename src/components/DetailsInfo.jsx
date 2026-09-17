@@ -79,165 +79,184 @@ const DetailsInfo = () => {
     }
 
     return (
-        <div className='max-w-[1536px] mx-auto relative flex flex-col md:flex-row gap-8 md:gap-10 md:px-20'>
-            <div
-                className='absolute top-0 right-0 left-0 w-full h-[590px] md:h-[600px] max-w-[1536px] bg-cover bg-center bg-[#14213d] bg-no-repeat rounded-b-md'
-                style={{
-                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${getImageUrl('original', mediaData?.backdrop_path)})`,
-                    backgroundColor: '#14213d',
-                }}
-            ></div>
+        <div className="relative w-full bg-[#0f172a] text-white min-h-[450px]">
+            {/* Hero Backdrop Overlay */}
+            {mediaData?.backdrop_path && (
+                <div className="absolute top-0 left-0 right-0 h-[450px] sm:h-[550px] overflow-hidden pointer-events-none z-0">
+                    <img
+                        src={getImageUrl('original', mediaData.backdrop_path)}
+                        alt="Backdrop"
+                        className="w-full h-full object-cover object-top opacity-55"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/65 to-[#0f172a]/20" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a]/70 via-transparent to-[#0f172a]/70" />
+                </div>
+            )}
 
-            <div className='pt-40 md:pt-32 flex flex-col items-center md:items-start gap-2'>
-                <div className='min-w-[230px] max-w-[230px] relative'>
-                    {mediaData && mediaData.poster_path ? (
-                        <img
-                            src={getImageUrl('w500', mediaData?.poster_path)}
-                            alt={mediaData?.title || mediaData?.name}
-                            className='h-[300px] w-full object-cover rounded-md drop-shadow-md'
-                        />
-                    ) : (
-                        <div className={`h-[300px] w-full flex justify-center items-center bg-[#14213d] rounded-md drop-shadow-md`}>
-                            No Image found
+            {/* Main Content Container */}
+            <div className="relative z-10 max-w-7xl mx-auto pt-20 sm:pt-24 pb-4 px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col md:flex-row gap-8 lg:gap-12 items-center md:items-start">
+                    {/* Poster & CTA Buttons */}
+                    <div className="flex flex-col items-center min-w-[220px] max-w-[260px] sm:max-w-[280px] w-full flex-shrink-0">
+                        <div className="relative w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border border-gray-700/60 group">
+                            {mediaData?.poster_path ? (
+                                <img
+                                    src={getImageUrl('w500', mediaData.poster_path)}
+                                    alt={mediaData?.title || mediaData?.name}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex justify-center items-center bg-[#14213d] text-gray-400 font-medium">
+                                    No Poster Image
+                                </div>
+                            )}
                         </div>
-                    )}
 
-                    <button className='absolute top-2.5 right-2.5 p-2.5 rounded-[50%] bg-gray-900 cursor-pointer' onClick={handleClick}>
-                        {isInWatchlist ? <FaBookmark /> : <FaRegBookmark />}
-                    </button>
-                </div>
+                        {/* Action Buttons */}
+                        <div className="w-full mt-4 flex flex-col gap-2.5">
+                            <Link to={`/player/${type}/${id}`} className="w-full">
+                                <button className="w-full py-3 px-5 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold rounded-xl shadow-lg shadow-red-600/30 flex items-center justify-center gap-2.5 transition-all duration-300 cursor-pointer">
+                                    <FaPlay className="text-sm" />
+                                    <span>Watch Trailer</span>
+                                </button>
+                            </Link>
 
-                <Link to={`/player/${type}/${id}`}>
-                    {mediaData && (
-                        <button className='flex items-center drop-shadow-md justify-center w-full py-2 gap-4 text-lg font-semibold cursor-pointer bg-white text-black rounded hover:bg-[#ffffffbf] whitespace-nowrap min-w-[230px] max-w-[230px] hover:scale-105 transition-transform duration-300 ease-in-out'>
-                            <FaPlay />
-                            Play Now
-                        </button>
-                    )}
-                </Link>
-            </div>
-
-            <div className='pt-16 md:pt-32 flex flex-col gap-2 md:gap-2.5 px-3 md:px-0 py-3 md:py-0'>
-                <h2 className='text-4xl font-bold w-full text-white drop-shadow-md text-center md:text-left'>
-                    {mediaData?.title || mediaData?.name}
-                </h2>
-
-                {mediaData?.tagline && (
-                    <p className='text-base font-medium text-gray-200 drop-shadow-md line-clamp-2 text-ellipsis text-center md:text-left'>
-                        {mediaData?.tagline}
-                    </p>
-                )}
-
-                <div className='flex flex-row gap-3 justify-center md:justify-normal text-base'>
-                    {mediaData && (
-                        <p className='flex items-center gap-1 drop-shadow-md'>
-                            <FaStar />
-                            {mediaData.vote_average > 0 ? Number(mediaData.vote_average).toFixed(1) : 'N/A'}
-                        </p>
-                    )}
-
-                    {mediaData?.release_date && (
-                        <p className='flex items-center gap-1 drop-shadow-md'>
-                            <FaRegCalendarAlt />
-                            {moment(mediaData?.release_date).format('MMM DD YYYY')}
-                        </p>
-                    )}
-
-                    {mediaData && (
-                        <p className='capitalize flex items-center gap-1 drop-shadow-md'>
-                            <BiCameraMovie />
-                            {`${type}`}
-                        </p>
-                    )}
-
-                    {runtime && (
-                        <p className='flex items-center gap-1 drop-shadow-md'>
-                            <FaRegClock />
-                            {runtime >= 60 ? `${Math.floor(runtime / 60)}h ${runtime % 60}m` : `${runtime}m`}
-                        </p>
-                    )}
-                </div>
-
-                {mediaData?.status && (
-                    <p className='flex items-center gap-1 font-normal drop-shadow-md justify-center md:justify-normal'>
-                        <span className='font-semibold'>Status: </span>
-                        {mediaData.status}
-                    </p>
-                )}
-
-                {(mediaData?.first_air_date && mediaData?.last_air_date) && (
-                    <div className='flex flex-col md:flex-row items-center gap-3 justify-center md:justify-normal text-sm'>
-                        <p className='flex items-center gap-1 drop-shadow-md'>
-                            <span>First Aired: </span>
-                            {moment(mediaData?.first_air_date).format('MMM DD YYYY')}
-                        </p>
-                        <p className='flex items-center gap-1 drop-shadow-md'>
-                            <span>Last Aired: </span>
-                            {moment(mediaData?.last_air_date).format('MMM DD YYYY')}
-                        </p>
-                    </div>
-                )}
-
-                {(mediaData?.number_of_seasons || mediaData?.number_of_episodes) && (
-                    <div className='flex gap-2 items-center justify-center md:justify-start text-sm font-medium'>
-                        {mediaData?.number_of_seasons && (
-                            <p className='drop-shadow-md'>
-                                Seasons: {mediaData?.number_of_seasons}
-                            </p>
-                        )}
-
-                        {mediaData?.number_of_episodes && (
-                            <p className='drop-shadow-md'>
-                                Episodes: {mediaData?.number_of_episodes}
-                            </p>
-                        )}
-                    </div>
-                )}
-
-                {mediaData.genres && (
-                    <div className='flex flex-wrap justify-center md:justify-normal gap-2 w-full'>
-                        {mediaData.genres.map((genre) => (
-                            <div
-                                key={genre.id}
-                                className='drop-shadow-md px-1 md:px-4 py-0.5 bg-[#14213d] rounded-md text-xs md:text-sm font-semibold truncate'
+                            <button
+                                onClick={handleClick}
+                                className={`w-full py-2.5 px-5 font-semibold rounded-xl border flex items-center justify-center gap-2.5 transition-all duration-300 cursor-pointer ${
+                                    isInWatchlist
+                                        ? 'bg-red-600/20 text-red-400 border-red-500/40 hover:bg-red-600/30'
+                                        : 'bg-slate-800/80 hover:bg-slate-700 text-gray-200 border-gray-700'
+                                }`}
                             >
-                                {genre.name}
+                                {isInWatchlist ? <FaBookmark className="text-red-500" /> : <FaRegBookmark />}
+                                <span>{isInWatchlist ? 'In Watchlist' : 'Add to Watchlist'}</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Movie Info Section */}
+                    <div className="flex flex-col gap-4 text-center md:text-left flex-1 min-w-0">
+                        <div>
+                            <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+                                {mediaData?.title || mediaData?.name}
+                            </h1>
+
+                            {mediaData?.tagline && (
+                                <p className="text-sm sm:text-base italic text-gray-300/90 mt-1">
+                                    "{mediaData.tagline}"
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Metadata Pills */}
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3 text-xs sm:text-sm font-semibold text-gray-300">
+                            {mediaData?.vote_average > 0 && (
+                                <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full">
+                                    <FaStar className="text-amber-400" />
+                                    {Number(mediaData.vote_average).toFixed(1)}
+                                    {mediaData?.vote_count > 0 && (
+                                        <span className="text-[11px] text-amber-300/70 font-normal">
+                                            ({mediaData.vote_count})
+                                        </span>
+                                    )}
+                                </span>
+                            )}
+
+                            {(mediaData?.release_date || mediaData?.first_air_date) && (
+                                <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-800/80 border border-gray-700 rounded-full">
+                                    <FaRegCalendarAlt className="text-red-400" />
+                                    {moment(mediaData.release_date || mediaData.first_air_date).format('MMM DD, YYYY')}
+                                </span>
+                            )}
+
+                            <span className="capitalize flex items-center gap-1.5 px-3 py-1 bg-slate-800/80 border border-gray-700 rounded-full">
+                                <BiCameraMovie className="text-red-400" />
+                                {type}
+                            </span>
+
+                            {runtime > 0 && (
+                                <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-800/80 border border-gray-700 rounded-full">
+                                    <FaRegClock className="text-red-400" />
+                                    {runtime >= 60 ? `${Math.floor(runtime / 60)}h ${runtime % 60}m` : `${runtime}m`}
+                                </span>
+                            )}
+
+                            {mediaData?.status && (
+                                <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full">
+                                    {mediaData.status}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Genres */}
+                        {mediaData?.genres?.length > 0 && (
+                            <div className="flex flex-wrap justify-center md:justify-start gap-2 pt-1">
+                                {mediaData.genres.map((genre) => (
+                                    <span
+                                        key={genre.id}
+                                        className="px-3 py-1 bg-[#14213d]/80 border border-gray-700/70 rounded-lg text-xs font-semibold text-gray-200 hover:border-red-500/50 transition-colors"
+                                    >
+                                        {genre.name}
+                                    </span>
+                                ))}
                             </div>
-                        ))}
+                        )}
+
+                        {/* Overview / Synopsis */}
+                        {mediaData?.overview && (
+                            <div className="pt-2">
+                                <h3 className="text-lg font-bold text-white mb-1.5">Overview</h3>
+                                <p className="text-sm sm:text-base text-gray-300 leading-relaxed max-w-3xl">
+                                    {mediaData.overview}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Details Grid (Budget, Revenue, Seasons, Episodes) */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-gray-800/80 mt-2">
+                            {mediaData?.budget > 0 && (
+                                <div className="bg-[#14213d]/50 p-3 rounded-xl border border-gray-800 text-center md:text-left">
+                                    <span className="text-xs text-gray-400 font-medium block">Budget</span>
+                                    <span className="text-sm font-semibold text-white">
+                                        ${mediaData.budget.toLocaleString()}
+                                    </span>
+                                </div>
+                            )}
+
+                            {mediaData?.revenue > 0 && (
+                                <div className="bg-[#14213d]/50 p-3 rounded-xl border border-gray-800 text-center md:text-left">
+                                    <span className="text-xs text-gray-400 font-medium block">Revenue</span>
+                                    <span className="text-sm font-semibold text-white">
+                                        ${mediaData.revenue.toLocaleString()}
+                                    </span>
+                                </div>
+                            )}
+
+                            {mediaData?.number_of_seasons > 0 && (
+                                <div className="bg-[#14213d]/50 p-3 rounded-xl border border-gray-800 text-center md:text-left">
+                                    <span className="text-xs text-gray-400 font-medium block">Seasons</span>
+                                    <span className="text-sm font-semibold text-white">
+                                        {mediaData.number_of_seasons}
+                                    </span>
+                                </div>
+                            )}
+
+                            {mediaData?.number_of_episodes > 0 && (
+                                <div className="bg-[#14213d]/50 p-3 rounded-xl border border-gray-800 text-center md:text-left">
+                                    <span className="text-xs text-gray-400 font-medium block">Episodes</span>
+                                    <span className="text-sm font-semibold text-white">
+                                        {mediaData.number_of_episodes}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                )}
-
-                <div className='flex flex-row items-center justify-center md:justify-normal gap-2 md:gap-3 text-sm'>
-                    <p className='drop-shadow-md'>
-                        <span className='font-semibold'>Budget: </span>
-                        {mediaData?.budget > 0
-                            ? mediaData?.budget.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 })
-                            : 'N/A'}
-                    </p>
-
-                    <p className='drop-shadow-md'>
-                        <span className='font-semibold'>Revenue: </span>
-                        {mediaData?.revenue > 0
-                            ? mediaData?.revenue.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 })
-                            : 'N/A'}
-                    </p>
                 </div>
-
-                {mediaData?.overview && (
-                    <div className='pt-1 md:pt-0'>
-                        <h3 className='text-xl leading-7 font-bold mb-2 md:mb-0.25 drop-shadow-md'>
-                            Synopsis
-                        </h3>
-
-                        <p className='max-w-3xl text-sm text-white drop-shadow-md'>
-                            {mediaData?.overview}
-                        </p>
-                    </div>
-                )}
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default DetailsInfo
 

@@ -67,17 +67,17 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
     };
 
     return (
-        <section className="flex flex-col group relative px-2 sm:px-4 md:px-8 lg:px-12 my-3">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 text-white w-full">
             {data.length > 0 && (
-                <div className="flex justify-between items-center bg-[#14213d] py-3 px-4 sm:px-6 rounded-xl mb-3 shadow-md">
+                <div className="flex justify-between items-center bg-[#14213d] py-3 px-4 sm:px-6 rounded-xl mb-3 shadow-md border border-gray-800/60">
                     <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-wide">
                         {title && title}
                     </h2>
 
                     <Link to={`/explore/${type || 'all'}/${title.toLowerCase().replace(/\s+/g, '-')}`} state={{ endpoint, genreId }}>
-                        <h5 className="text-xs md:text-sm font-semibold border border-white/30 rounded-full px-3.5 py-1.5 cursor-pointer whitespace-nowrap hover:bg-white hover:text-black transition-all shadow-sm">
+                        <span className="text-xs sm:text-sm font-semibold border border-white/30 rounded-full px-3.5 py-1.5 cursor-pointer whitespace-nowrap hover:bg-white hover:text-black transition-all shadow-sm">
                             View more
-                        </h5>
+                        </span>
                     </Link>
                 </div>
             )}
@@ -97,7 +97,7 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
 
                     {/* Movie Cards Container */}
                     <div
-                        className="flex gap-4 overflow-x-auto scrollbar-hide py-2 md:py-3 scroll-smooth"
+                        className="flex gap-4 overflow-x-auto scrollbar-hide py-1.5 scroll-smooth"
                         ref={sliderRef}
                     >
                         {data.length > 0 &&
