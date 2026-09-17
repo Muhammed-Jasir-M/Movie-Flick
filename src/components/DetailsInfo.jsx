@@ -20,6 +20,7 @@ const DetailsInfo = () => {
     const { user } = useAuthContext();
 
     const { type, id } = useParams();
+    const mediaType = type === 'anime' ? 'tv' : type;
 
     const runtime = mediaData?.runtime || mediaData?.last_episode_to_air?.runtime || mediaData?.episode_run_time?.[0];
 
@@ -27,14 +28,14 @@ const DetailsInfo = () => {
         setLoading(true);
 
         try {
-            const response = await axiosInstance.get(`/${type}/${id}`);
+            const response = await axiosInstance.get(`/${mediaType}/${id}`);
             setMediaData(response.data);
         } catch (error) {
             console.error("Error fetching:", error);
         } finally {
             setLoading(false);
         }
-    }, [id, type]);
+    }, [id, mediaType]);
 
     useEffect(() => {
         fetchData();

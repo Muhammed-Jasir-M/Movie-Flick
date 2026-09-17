@@ -65,6 +65,7 @@ const Header = () => {
                             <NavLink
                                 to={navLink.href}
                                 key={navLink.label}
+                                end
                                 onClick={() => setNavbarToggle(false)}
                                 className={({ isActive }) => `${isActive && 'bg-[#0A1128]'}
                                     text-xl font-medium w-full text-center py-1.5 px-0 md:px-2 hover:bg-[#0A1128] whitespace-nowrap rounded`}

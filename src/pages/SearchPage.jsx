@@ -47,7 +47,7 @@ const SearchPage = () => {
                 });
             } else if (activeTab === 'anime') {
                 if (search.trim().length > 0) {
-                    response = await axiosInstance.get('/search/tv', {
+                    response = await axiosInstance.get('/search/multi', {
                         params: { query: search, page: page },
                     });
                 } else {
@@ -79,7 +79,7 @@ const SearchPage = () => {
 
             let results = response.data.results || [];
 
-            if (activeTab === 'multi') {
+            if (activeTab === 'multi' || activeTab === 'anime') {
                 results = results.filter((result) => result.media_type !== 'person');
             }
 
@@ -298,7 +298,7 @@ const SearchPage = () => {
                                 <PosterCard
                                     key={`${data.id}-${index}`}
                                     data={data}
-                                    type={activeTab === 'multi' ? data.media_type || 'movie' : activeTab}
+                                    type={data.media_type || (data.first_air_date ? 'tv' : 'movie') || (activeTab === 'multi' || activeTab === 'anime' ? 'tv' : activeTab)}
                                     isSmall
                                 />
                             ))}

@@ -13,7 +13,8 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
     const [inWatchlist, setInWatchlist] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
 
-    const mediaType = data?.media_type || type || 'movie';
+    const rawType = data?.media_type || (data?.first_air_date ? 'tv' : 'movie') || type || 'movie';
+    const mediaType = rawType === 'anime' ? (data?.first_air_date ? 'tv' : 'movie') : rawType;
 
     // Check if item is already in watchlist
     useEffect(() => {
@@ -92,11 +93,16 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
                     </h3>
 
                     <div className="flex justify-between items-center text-xs text-gray-400 mt-1 font-medium">
-                        <span>
-                            {moment(data.release_date || data.first_air_date).format('YYYY') !== 'Invalid date'
-                                ? moment(data.release_date || data.first_air_date).format('YYYY')
-                                : ''}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] uppercase font-bold text-gray-300 bg-slate-800 px-1.5 py-0.5 rounded border border-gray-700/60">
+                                {mediaType === 'tv' ? 'TV' : 'Movie'}
+                            </span>
+                            <span>
+                                {moment(data.release_date || data.first_air_date).format('YYYY') !== 'Invalid date'
+                                    ? moment(data.release_date || data.first_air_date).format('YYYY')
+                                    : ''}
+                            </span>
+                        </div>
 
                         <span className="bg-slate-800 text-yellow-400 px-1.5 py-0.5 rounded text-[11px] font-bold">
                             {data?.vote_average > 0 ? Number(data.vote_average).toFixed(1) : 'N/A'}
@@ -108,6 +114,13 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
                 {isTrending && (
                     <div className="absolute top-2 left-0 bg-red-600/90 text-white font-bold text-xs px-3 py-1 rounded-r-full shadow-md backdrop-blur-sm z-10">
                         #{index} Trending
+                    </div>
+                )}
+
+                {/* Media Type Badge (when not trending) */}
+                {!isTrending && (
+                    <div className="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-md text-gray-200 border border-gray-700/60 font-semibold text-[10px] uppercase px-2 py-0.5 rounded-md shadow-md z-10">
+                        {mediaType === 'tv' ? 'TV Show' : 'Movie'}
                     </div>
                 )}
 
