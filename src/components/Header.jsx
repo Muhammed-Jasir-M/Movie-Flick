@@ -12,7 +12,7 @@ const Header = () => {
     const navLinks = [
         {
             label: 'Home',
-            href: '/',
+            href: '/home',
         },
         {
             label: 'Movies',
@@ -48,7 +48,7 @@ const Header = () => {
             `}
         >
             <div className='w-full flex gap-5 justify-between items-center'>
-                <Link to='/landing'>
+                <Link to='/'>
                     <h1 className='text-3xl font-bold whitespace-nowrap cursor-pointer hover:text-red-500 transition-colors'>
                         Movie Flick
                     </h1>
