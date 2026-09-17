@@ -48,28 +48,31 @@ const PlayerPage = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen">
-                <Spinner borderColor={'border-white'} />
+            <div className="flex justify-center items-center h-screen bg-[#0f172a]">
+                <Spinner borderColor={'border-red-600'} />
             </div>
         );
     }
 
     if (isEmpty) {
         return (
-            <div className="flex justify-center items-center h-screen">
-                <p className="text-white text-xl">Videos are not available</p>
+            <div className="flex flex-col justify-center items-center h-screen bg-[#0f172a] text-center px-4">
+                <div className="p-6 bg-[#14213d]/60 backdrop-blur-md rounded-2xl border border-gray-800 shadow-xl max-w-md">
+                    <p className="text-white text-xl font-semibold mb-2">No Videos Available</p>
+                    <p className="text-gray-400 text-sm">We couldn't find any trailers or clips for this title.</p>
+                </div>
             </div>
         )
     }
 
     return (
-        <section className='pt-20 pb-5 min-h-screen'>
-            <Player videos={trailerVideos} />
-            <Player videos={teaserVideos} />
-            <Player videos={clipVideos} />
-            <Player videos={featuretteVideos} />
-            <Player videos={bts} />
-            <Player videos={bloopers} />
+        <section className='pt-16 sm:pt-20 pb-8 sm:pb-12 min-h-screen px-2.5 sm:px-4 bg-[#0f172a]'>
+            <Player title="Trailers" videos={trailerVideos} />
+            <Player title="Teasers" videos={teaserVideos} />
+            <Player title="Clips" videos={clipVideos} />
+            <Player title="Featurettes" videos={featuretteVideos} />
+            <Player title="Behind The Scenes" videos={bts} />
+            <Player title="Bloopers" videos={bloopers} />
         </section>
     )
 }
