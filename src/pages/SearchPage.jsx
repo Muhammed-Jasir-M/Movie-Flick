@@ -45,6 +45,20 @@ const SearchPage = () => {
                 response = await axiosInstance.get('/search/person', {
                     params: { query: search, page: page },
                 });
+            } else if (activeTab === 'anime') {
+                if (search.trim().length > 0) {
+                    response = await axiosInstance.get('/search/tv', {
+                        params: { query: search, page: page },
+                    });
+                } else {
+                    response = await axiosInstance.get('/discover/tv', {
+                        params: {
+                            with_genres: selectedGenre ? `${selectedGenre},16` : 16,
+                            sort_by: sortBy,
+                            page: page,
+                        },
+                    });
+                }
             } else if (selectedGenre && search.trim().length === 0) {
                 const mediaType = activeTab === 'multi' ? 'movie' : activeTab;
                 response = await axiosInstance.get(`/discover/${mediaType}`, {
@@ -69,7 +83,12 @@ const SearchPage = () => {
                 results = results.filter((result) => result.media_type !== 'person');
             }
 
-            if (selectedGenre && search.trim().length > 0 && activeTab !== 'person') {
+            if (activeTab === 'anime' && search.trim().length > 0) {
+                // Filter search results for animation genre id 16
+                results = results.filter((item) => item.genre_ids?.includes(16) || item.genre_ids?.includes(10759));
+            }
+
+            if (selectedGenre && search.trim().length > 0 && activeTab !== 'person' && activeTab !== 'anime') {
                 const genreIdNum = Number(selectedGenre);
                 results = results.filter((item) => item.genre_ids?.includes(genreIdNum));
             }
@@ -151,7 +170,7 @@ const SearchPage = () => {
                 <div className="relative max-w-2xl w-full flex items-center">
                     <input
                         type="text"
-                        placeholder={`Search for ${activeTab === 'multi' ? 'movies & TV shows...' : activeTab === 'tv' ? 'TV shows...' : activeTab === 'person' ? 'actors & crew...' : 'movies...'}`}
+                        placeholder={`Search for ${activeTab === 'multi' ? 'movies & TV shows...' : activeTab === 'tv' ? 'TV shows...' : activeTab === 'anime' ? 'anime titles...' : activeTab === 'person' ? 'actors & crew...' : 'movies...'}`}
                         className="w-full h-12 pl-5 pr-12 py-3 rounded-xl bg-[#14213d] text-white text-lg outline-none border border-gray-700 focus:border-red-500 transition-colors shadow-lg"
                         onChange={handleSearch}
                         value={inputValue}
@@ -192,6 +211,12 @@ const SearchPage = () => {
                         onClick={() => handleTabClick('tv')}
                     >
                         TV Shows
+                    </button>
+                    <button
+                        className={`py-1.5 px-4 rounded-lg font-semibold text-sm transition-colors ${activeTab === 'anime' ? 'bg-red-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700'}`}
+                        onClick={() => handleTabClick('anime')}
+                    >
+                        Anime
                     </button>
                     <button
                         className={`py-1.5 px-4 rounded-lg font-semibold text-sm transition-colors ${activeTab === 'person' ? 'bg-red-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700'}`}

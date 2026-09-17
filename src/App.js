@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Home from './pages/Home'
 import Movies from './pages/Movies'
 import Tv from './pages/Tv'
+import Anime from './pages/Anime'
 import BottomNavbar from './components/BottomNavbar'
 import SearchPage from './pages/SearchPage'
 import Footer from './components/Footer'
@@ -38,6 +39,7 @@ const App = () => {
                         <Route path='/landing' element={<LandingPage />} />
                         <Route path='/movies' element={<Movies />} />
                         <Route path='/tv' element={<Tv />} />
+                        <Route path='/anime' element={<Anime />} />
                         <Route path='/search' element={<SearchPage />} />
                         <Route path='/:type/:id' element={<DetailsPage />} />
                         <Route path='/person/:id' element={<PersonDetails />} />

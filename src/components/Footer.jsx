@@ -9,6 +9,7 @@ const Footer = () => {
                 { label: 'Home', path: '/' },
                 { label: 'Movies', path: '/movies' },
                 { label: 'TV Shows', path: '/tv' },
+                { label: 'Anime', path: '/anime' },
                 { label: 'Search', path: '/search' },
             ],
         },

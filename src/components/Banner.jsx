@@ -45,8 +45,31 @@ const Banner = ({ mediaType }) => {
         }
     };
 
+    const fetchTrendingAnime = async () => {
+        setLoading(true);
+        try {
+            const response = await axiosInstance.get('/discover/tv', {
+                params: {
+                    with_genres: 16,
+                    sort_by: 'popularity.desc',
+                },
+            });
+            const results = (response.data?.results || []).map((item) => ({
+                ...item,
+                media_type: 'tv',
+            }));
+            setTrendingData(results);
+        } catch (error) {
+            console.error("Error fetching anime banner:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        if (path.includes('/movies')) {
+        if (path.includes('/anime')) {
+            fetchTrendingAnime();
+        } else if (path.includes('/movies')) {
             fetchTrending('movie', 'week');
         } else if (path.includes('/tv')) {
             fetchTrending('tv', 'week');

@@ -22,6 +22,10 @@ const Header = () => {
         {
             label: 'TV Shows',
             href: '/tv',
+        },
+        {
+            label: 'Anime',
+            href: '/anime',
         }
     ];
 
