@@ -1,52 +1,47 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import tmdbApi from '../api/tmdbApi';
 import { getImageUrl } from '../constants/constants';
 import PosterCard from '../components/PosterCard';
 import { PersonDetailsSkeleton } from '../components/SkeletonLoaders';
 import useInfiniteScroll from '../hooks/useInfiniteScroll';
 import moment from 'moment';
+import { usePersonCreditsQuery, usePersonDetailsQuery } from '../hooks/useTmdbQueries';
 
 const PersonDetails = () => {
     const { id } = useParams();
-    const [person, setPerson] = useState(null);
-    const [credits, setCredits] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { data: person, isLoading: loadingPerson } = usePersonDetailsQuery(id);
+    const { data: creditsRaw, isLoading: loadingCredits } = usePersonCreditsQuery(id);
+
     const [isBioExpanded, setIsBioExpanded] = useState(false);
     const [visibleCount, setVisibleCount] = useState(12);
 
-    const fetchPersonDetails = useCallback(async () => {
-        setLoading(true);
-        try {
-            const [personData, creditsData] = await Promise.all([
-                tmdbApi.getPersonDetails(id),
-                tmdbApi.getPersonCredits(id)
-            ]);
+    const loading = loadingPerson || loadingCredits;
 
-            setPerson(personData);
+    const credits = useMemo(() => {
+        if (!creditsRaw?.cast) return [];
+        const seen = new Set();
+        const uniqueList = [];
 
-            // Filter and sort top credits by popularity
-            const sortedCredits = (creditsData.cast || [])
-                .filter(item => item.poster_path)
-                .sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+        const sorted = [...(creditsRaw.cast || [])]
+            .filter((item) => item.poster_path)
+            .sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
 
-            setCredits(sortedCredits);
-        } catch (error) {
-            console.error("Error fetching person details:", error);
-        } finally {
-            setLoading(false);
+        for (const item of sorted) {
+            const uniqueKey = `${item.media_type || 'movie'}-${item.id}`;
+            if (!seen.has(uniqueKey)) {
+                seen.add(uniqueKey);
+                uniqueList.push(item);
+            }
         }
-    }, [id]);
+
+        return uniqueList;
+    }, [creditsRaw]);
 
     const handleLoadMore = useCallback(() => {
         setVisibleCount(prev => Math.min(prev + 10, credits.length));
     }, [credits.length]);
 
     useInfiniteScroll(handleLoadMore, visibleCount < credits.length, loading, 400);
-
-    useEffect(() => {
-        fetchPersonDetails();
-    }, [fetchPersonDetails]);
 
     if (loading) {
         return <PersonDetailsSkeleton />;

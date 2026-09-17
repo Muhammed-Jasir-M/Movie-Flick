@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import tmdbApi from '../api/tmdbApi';
+import React from 'react';
 import { getImageUrl } from '../constants/constants';
 import { Link } from 'react-router-dom';
 import { FaPlay, FaRegCalendarAlt, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { MdInfoOutline } from 'react-icons/md';
 import { MovieGenres, TvShowGenres } from '../constants/GenreList';
+import { useTrendingAllQuery, useTrendingAnimeQuery, useTrendingQuery } from '../hooks/useTmdbQueries';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
@@ -30,60 +30,25 @@ const getGenreNames = (genreIds) => {
 };
 
 const Banner = ({ mediaType }) => {
-    const [trendingData, setTrendingData] = useState([]);
-    const [loading, setLoading] = useState(false);
-
     const path = window.location.pathname;
 
-    const fetchTrendingAll = async () => {
-        setLoading(true);
-        try {
-            const data = await tmdbApi.getTrendingAll();
-            setTrendingData(data);
-        } catch (error) {
-            console.error("Error fetching trending all:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const isAnime = path.includes('/anime');
+    const isMovies = path.includes('/movies');
+    const isTv = path.includes('/tv');
 
-    const fetchTrending = async (type, time) => {
-        setLoading(true);
-        try {
-            const data = await tmdbApi.getTrending(type, time);
-            setTrendingData(data);
-        } catch (error) {
-            console.error("Error fetching trending data:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const animeQuery = useTrendingAnimeQuery();
+    const moviesQuery = useTrendingQuery('movie', 'week');
+    const tvQuery = useTrendingQuery('tv', 'week');
+    const allQuery = useTrendingAllQuery();
 
-    const fetchTrendingAnime = async () => {
-        setLoading(true);
-        try {
-            const res = await tmdbApi.getTrendingAnime();
-            setTrendingData(res.results);
-        } catch (error) {
-            console.error("Error fetching anime banner:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    let queryToUse = allQuery;
+    if (isAnime) queryToUse = animeQuery;
+    else if (isMovies) queryToUse = moviesQuery;
+    else if (isTv) queryToUse = tvQuery;
 
-    useEffect(() => {
-        if (path.includes('/anime')) {
-            fetchTrendingAnime();
-        } else if (path.includes('/movies')) {
-            fetchTrending('movie', 'week');
-        } else if (path.includes('/tv')) {
-            fetchTrending('tv', 'week');
-        } else {
-            fetchTrendingAll();
-        }
-    }, [path]);
+    const { data: trendingData = [], isLoading } = queryToUse;
 
-    if (loading) {
+    if (isLoading) {
         return <BannerSkeleton />;
     }
 

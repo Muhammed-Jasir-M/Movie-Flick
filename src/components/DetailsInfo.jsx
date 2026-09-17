@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import tmdbApi from '../api/tmdbApi';
+import React, { useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getImageUrl } from '../constants/constants';
 import { FaBookmark, FaExternalLinkAlt, FaPlay, FaRegBookmark, FaRegCalendarAlt, FaRegClock, FaStar } from 'react-icons/fa';
@@ -9,62 +8,29 @@ import { useWatchlistContext } from '../store/watchlistContext';
 import { useAuthContext } from '../store/authContext';
 import { toast } from 'react-toastify';
 import { DetailsSkeleton } from './SkeletonLoaders';
+import { useMediaDetailsQuery, useWatchlistQuery } from '../hooks/useTmdbQueries';
 
 const DetailsInfo = () => {
-    const [mediaData, setMediaData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
-    const [isInWatchlist, setIsInWatchlist] = useState(false);
-
-    const { addToWatchlist, removeFromWatchlist, fetchWatchlist } = useWatchlistContext();
-    const { user } = useAuthContext();
-
     const { type, id } = useParams();
     const mediaType = type === 'anime' ? 'tv' : type;
 
+    const { data: mediaData, isLoading: loading, isError: error, refetch } = useMediaDetailsQuery(mediaType, id);
+
+    const { addToWatchlist, removeFromWatchlist, fetchWatchlist } = useWatchlistContext();
+    const { user } = useAuthContext();
+    const { data: watchlistData = [], refetch: refetchWatchlist } = useWatchlistQuery(user?.uid, fetchWatchlist);
+
+    const isInWatchlist = useMemo(() => {
+        if (!mediaData?.id || !watchlistData) return false;
+        return watchlistData.some(item => Number(item.id) === Number(mediaData.id) || item.id === `${type}-${mediaData.id}`);
+    }, [mediaData?.id, watchlistData, type]);
+
     const runtime = mediaData?.runtime || mediaData?.last_episode_to_air?.runtime || mediaData?.episode_run_time?.[0];
-
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        setError(false);
-
-        try {
-            const data = await tmdbApi.getMediaDetails(mediaType, id);
-            if (data && data.id) {
-                setMediaData(data);
-            } else {
-                setError(true);
-            }
-        } catch (err) {
-            console.error("Error fetching media details:", err);
-            setError(true);
-        } finally {
-            setLoading(false);
-        }
-    }, [id, mediaType]);
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-
-    useEffect(() => {
-        const checkWatchlistStatus = async () => {
-            if (mediaData?.id) {
-                const watchlist = await fetchWatchlist(user?.uid);
-                const isSaved = watchlist.some(item => Number(item.id) === Number(mediaData.id) || item.id === `${type}-${mediaData.id}`);
-                setIsInWatchlist(isSaved);
-            }
-        };
-
-        checkWatchlistStatus();
-    }, [user?.uid, mediaData?.id, type, fetchWatchlist]);
-
     const [watchlistLoading, setWatchlistLoading] = useState(false);
 
     const handleClick = async () => {
         setWatchlistLoading(true);
         const nextState = !isInWatchlist;
-        setIsInWatchlist(nextState);
 
         try {
             if (nextState) {
@@ -74,9 +40,9 @@ const DetailsInfo = () => {
                 await removeFromWatchlist(user?.uid, mediaData, type);
                 toast.success('Removed from watchlist');
             }
+            refetchWatchlist();
         } catch (error) {
             console.error('Error updating watchlist:', error);
-            setIsInWatchlist(!nextState); // revert on error
             toast.error('Failed to update watchlist');
         } finally {
             setWatchlistLoading(false);
@@ -100,7 +66,7 @@ const DetailsInfo = () => {
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-3">
                         <button
-                            onClick={fetchData}
+                            onClick={() => refetch()}
                             className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-red-600/30 text-sm cursor-pointer"
                         >
                             Retry

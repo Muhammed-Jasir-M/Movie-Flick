@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import tmdbApi from '../api/tmdbApi';
 import PosterCard from '../components/PosterCard';
 import Spinner from '../components/Spinner';
 import { PosterCardSkeleton } from '../components/SkeletonLoaders';
@@ -8,6 +7,7 @@ import { MovieGenres, TvShowGenres } from '../constants/GenreList';
 import { getImageUrl } from '../constants/constants';
 import { SORT_OPTIONS } from '../constants/apiEndpoints';
 import useInfiniteScroll from '../hooks/useInfiniteScroll';
+import { useSearchInfiniteQuery } from '../hooks/useTmdbQueries';
 
 const SearchPage = () => {
     const [activeTab, setActiveTab] = useState('multi'); // multi, movie, tv, person, anime
@@ -15,98 +15,57 @@ const SearchPage = () => {
     const [inputValue, setInputValue] = useState('');
     const [selectedGenre, setSelectedGenre] = useState('');
     const [sortBy, setSortBy] = useState('popularity.desc');
-    const [medias, setMedias] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
-    const [loadingMore, setLoadingMore] = useState(false);
 
     const searchTimer = useRef(null);
 
     // Combine genres based on active tab
     const genres = activeTab === 'tv' ? TvShowGenres : MovieGenres;
 
-    const fetchData = useCallback(async () => {
-        if (!search.trim() && !selectedGenre) {
-            setMedias([]);
-            setLoading(false);
-            setLoadingMore(false);
-            return;
+    const {
+        data: infiniteData,
+        isLoading: loading,
+        isFetchingNextPage: loadingMore,
+        hasNextPage,
+        fetchNextPage
+    } = useSearchInfiniteQuery({ activeTab, search, selectedGenre, sortBy });
+
+    const medias = useMemo(() => {
+        if (!infiniteData?.pages) return [];
+        let items = infiniteData.pages.flatMap((page) => page.results || []);
+
+        if (activeTab === 'multi' || activeTab === 'anime') {
+            items = items.filter((result) => result.media_type !== 'person');
         }
 
-        if (page > 1) {
-            setLoadingMore(true);
-        } else {
-            setLoading(true);
+        if (activeTab === 'anime' && search.trim().length > 0) {
+            items = items.filter((item) => item.genre_ids?.includes(16) || item.genre_ids?.includes(10759));
         }
 
-        try {
-            let res;
-
-            if (activeTab === 'person') {
-                res = await tmdbApi.searchPerson(search, page);
-            } else if (activeTab === 'anime') {
-                if (search.trim().length > 0) {
-                    res = await tmdbApi.searchMulti(search, page);
-                } else {
-                    res = await tmdbApi.getTrendingAnime({
-                        genreId: selectedGenre ? `${selectedGenre},16` : 16,
-                        sortBy,
-                        page,
-                    });
-                }
-            } else if (selectedGenre && search.trim().length === 0) {
-                const mediaType = activeTab === 'multi' ? 'movie' : activeTab;
-                res = await tmdbApi.getDiscoverMedia(mediaType, {
-                    with_genres: selectedGenre,
-                    sort_by: sortBy,
-                    page,
-                });
-            } else {
-                res = await tmdbApi.searchByType(activeTab, search, page);
-            }
-
-            let results = res.results || [];
-
-            if (activeTab === 'multi' || activeTab === 'anime') {
-                results = results.filter((result) => result.media_type !== 'person');
-            }
-
-            if (activeTab === 'anime' && search.trim().length > 0) {
-                // Filter search results for animation genre id 16 or 10759
-                results = results.filter((item) => item.genre_ids?.includes(16) || item.genre_ids?.includes(10759));
-            }
-
-            if (selectedGenre && search.trim().length > 0 && activeTab !== 'person' && activeTab !== 'anime') {
-                const genreIdNum = Number(selectedGenre);
-                results = results.filter((item) => item.genre_ids?.includes(genreIdNum));
-            }
-
-            setMedias((prev) => (page === 1 ? results : [...prev, ...results]));
-            setTotalPages(res.totalPages || 0);
-        } catch (error) {
-            console.error('Error fetching search results:', error);
-        } finally {
-            setLoading(false);
-            setLoadingMore(false);
+        if (selectedGenre && search.trim().length > 0 && activeTab !== 'person' && activeTab !== 'anime') {
+            const genreIdNum = Number(selectedGenre);
+            items = items.filter((item) => item.genre_ids?.includes(genreIdNum));
         }
-    }, [activeTab, page, search, selectedGenre, sortBy]);
+
+        const seen = new Set();
+        const uniqueItems = [];
+        for (const item of items) {
+            const key = `${item.media_type || activeTab || 'movie'}-${item.id}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                uniqueItems.push(item);
+            }
+        }
+
+        return uniqueItems;
+    }, [infiniteData, activeTab, search, selectedGenre]);
 
     const handleLoadNextPage = useCallback(() => {
-        setPage((prev) => prev + 1);
-    }, []);
-
-    useInfiniteScroll(handleLoadNextPage, page < totalPages, loading || loadingMore, 200);
-
-    useEffect(() => {
-        if (search.trim().length > 0 || selectedGenre) {
-            fetchData();
-        } else {
-            setMedias([]);
-            setPage(1);
-            setTotalPages(0);
+        if (hasNextPage && !loadingMore) {
+            fetchNextPage();
         }
-    }, [search, selectedGenre, sortBy, activeTab, page, fetchData]);
+    }, [hasNextPage, loadingMore, fetchNextPage]);
+
+    useInfiniteScroll(handleLoadNextPage, hasNextPage, loading || loadingMore, 200);
 
     const handleSearch = (e) => {
         const value = e.target.value;
@@ -115,8 +74,6 @@ const SearchPage = () => {
 
         searchTimer.current = setTimeout(() => {
             setSearch(value);
-            setPage(1);
-            setMedias([]);
         }, 300);
     };
 
@@ -124,27 +81,19 @@ const SearchPage = () => {
         setInputValue('');
         setSearch('');
         setSelectedGenre('');
-        setPage(1);
-        setMedias([]);
     };
 
     const handleTabClick = (tab) => {
         setActiveTab(tab);
         setSelectedGenre('');
-        setMedias([]);
-        setPage(1);
     };
 
     const handleGenreChange = (e) => {
         setSelectedGenre(e.target.value);
-        setPage(1);
-        setMedias([]);
     };
 
     const handleSortChange = (e) => {
         setSortBy(e.target.value);
-        setPage(1);
-        setMedias([]);
     };
 
     return (
@@ -243,7 +192,7 @@ const SearchPage = () => {
 
             {/* Results Grid */}
             <div className="flex flex-col justify-center items-center w-full mt-6">
-                {loading && page === 1 ? (
+                {loading ? (
                     <PosterCardSkeleton count={12} />
                 ) : medias.length > 0 ? (
                     activeTab === 'person' ? (

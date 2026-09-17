@@ -7,24 +7,38 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { WatchlistContextProvider } from './store/watchlistContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 1000 * 60 * 5, // 5 minutes
+            gcTime: 1000 * 60 * 30, // 30 minutes
+            refetchOnWindowFocus: false,
+            retry: 1,
+        },
+    },
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-        <AuthContextProvider>
-            <WatchlistContextProvider>
-                <ToastContainer
-                    position="bottom-right"
-                    autoClose={2500}
-                    hideProgressBar={false}
-                    closeOnClick
-                    pauseOnHover
-                    draggable
-                    theme="dark"
-                    newestOnTop={true}
-                />
-                <App />
-            </WatchlistContextProvider>
-        </AuthContextProvider>
+        <QueryClientProvider client={queryClient}>
+            <AuthContextProvider>
+                <WatchlistContextProvider>
+                    <ToastContainer
+                        position="bottom-right"
+                        autoClose={2500}
+                        hideProgressBar={false}
+                        closeOnClick
+                        pauseOnHover
+                        draggable
+                        theme="dark"
+                        newestOnTop={true}
+                    />
+                    <App />
+                </WatchlistContextProvider>
+            </AuthContextProvider>
+        </QueryClientProvider>
     </React.StrictMode>
 );

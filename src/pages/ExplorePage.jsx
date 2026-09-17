@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import tmdbApi from '../api/tmdbApi';
-import Spinner from '../components/Spinner';
 import PosterCard from '../components/PosterCard';
+import Spinner from '../components/Spinner';
 import { PosterCardSkeleton } from '../components/SkeletonLoaders';
 import useInfiniteScroll from '../hooks/useInfiniteScroll';
 import { FaArrowLeft } from 'react-icons/fa';
+import { useExploreInfiniteQuery } from '../hooks/useTmdbQueries';
 
 const ExplorePage = () => {
     const { state } = useLocation();
@@ -32,50 +32,38 @@ const ExplorePage = () => {
     const endpoint = resolveEndpoint();
     const genreId = state?.genreId;
 
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [loadingMore, setLoadingMore] = useState(false);
+    const {
+        data: infiniteData,
+        isLoading: loading,
+        isFetchingNextPage: loadingMore,
+        hasNextPage,
+        fetchNextPage,
+        refetch
+    } = useExploreInfiniteQuery(endpoint, genreId, type);
 
-    const fetchData = useCallback(async () => {
-        if (page > 1) {
-            setLoadingMore(true);
-        } else {
-            setLoading(true);
-        }
-
-        try {
-            let res;
-            if (genreId) {
-                res = await tmdbApi.getDiscoverMedia(type || 'movie', {
-                    with_genres: genreId,
-                    sort_by: 'popularity.desc',
-                    page,
-                });
-            } else {
-                res = await tmdbApi.getByEndpoint(endpoint, { page });
+    const data = useMemo(() => {
+        if (!infiniteData?.pages) return [];
+        const seen = new Set();
+        const unique = [];
+        for (const page of infiniteData.pages) {
+            for (const item of page.results || []) {
+                const key = `${item.media_type || type || 'movie'}-${item.id}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    unique.push(item);
+                }
             }
-
-            setData((prev) => (page === 1 ? res.results : [...prev, ...res.results]));
-            setTotalPages(res.totalPages);
-        } catch (error) {
-            console.error("Error fetching explore data:", error);
-        } finally {
-            setLoading(false);
-            setLoadingMore(false);
         }
-    }, [endpoint, genreId, page, type]);
+        return unique;
+    }, [infiniteData, type]);
 
     const handleLoadNextPage = useCallback(() => {
-        setPage((prev) => prev + 1);
-    }, []);
+        if (hasNextPage && !loadingMore) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, loadingMore, fetchNextPage]);
 
-    useInfiniteScroll(handleLoadNextPage, page < totalPages, loading || loadingMore, 250);
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+    useInfiniteScroll(handleLoadNextPage, hasNextPage, loading || loadingMore, 250);
 
     return (
         <section className="container mx-auto min-h-[800px] md:min-h-screen pt-24 pb-16 px-4 max-w-7xl">
@@ -94,7 +82,7 @@ const ExplorePage = () => {
             </div>
 
             {/* Results Grid */}
-            {loading && page === 1 ? (
+            {loading ? (
                 <PosterCardSkeleton count={14} />
             ) : data.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-x-3 md:gap-x-4 gap-y-4 pt-2 pb-4 w-full">
@@ -113,7 +101,7 @@ const ExplorePage = () => {
                     <h2 className="text-xl font-bold text-white mb-2">No content available</h2>
                     <p className="text-sm text-gray-400 mb-6">Try exploring a different category or retry loading.</p>
                     <button
-                        onClick={fetchData}
+                        onClick={() => refetch()}
                         className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl text-sm transition-all shadow-lg hover:shadow-red-600/30 cursor-pointer"
                     >
                         Retry

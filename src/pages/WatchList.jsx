@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useWatchlistContext } from "../store/watchlistContext";
 import { useAuthContext } from "../store/authContext";
 import PosterCard from "../components/PosterCard";
@@ -7,31 +7,16 @@ import { Link } from "react-router-dom";
 import { BsBookmarkFill } from "react-icons/bs";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { useWatchlistQuery } from "../hooks/useTmdbQueries";
 
 const WatchList = () => {
-  const [watchlist, setWatchlist] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("all"); // all, movie, tv
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const { fetchWatchlist, removeFromWatchlist } = useWatchlistContext();
   const { user } = useAuthContext();
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetchWatchlist(user?.uid);
-      setWatchlist(response || []);
-    } catch (error) {
-      console.error("Failed to fetch watchlist:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.uid, fetchWatchlist]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  const { data: watchlist = [], isLoading: loading, refetch } = useWatchlistQuery(user?.uid, fetchWatchlist);
 
   useEffect(() => {
     if (showClearConfirm) {
@@ -69,7 +54,7 @@ const WatchList = () => {
       for (const item of watchlist) {
         await removeFromWatchlist(user?.uid, item, item.type || "movie");
       }
-      setWatchlist([]);
+      refetch();
       setShowClearConfirm(false);
       toast.success("Watchlist cleared");
     } catch (error) {

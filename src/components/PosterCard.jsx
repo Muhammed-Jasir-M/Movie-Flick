@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { getImageUrl } from '../constants/constants';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
@@ -6,38 +6,28 @@ import { toast } from 'react-toastify';
 import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import { useWatchlistContext } from '../store/watchlistContext';
 import { useAuthContext } from '../store/authContext';
+import { useWatchlistQuery } from '../hooks/useTmdbQueries';
 
 const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGrid }) => {
     const { user } = useAuthContext();
     const { addToWatchlist, removeFromWatchlist, fetchWatchlist } = useWatchlistContext();
-    const [inWatchlist, setInWatchlist] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
 
     const rawType = data?.media_type || (data?.first_air_date ? 'tv' : 'movie') || type || 'movie';
     const mediaType = rawType === 'anime' ? (data?.first_air_date ? 'tv' : 'movie') : rawType;
 
-    // Check if item is already in watchlist
-    useEffect(() => {
-        const checkStatus = async () => {
-            if (data?.id) {
-                try {
-                    const list = await fetchWatchlist(user?.uid);
-                    const exists = list.some((item) => Number(item.id) === Number(data.id) || item.id === `${mediaType}-${data.id}`);
-                    setInWatchlist(exists);
-                } catch (e) {
-                    console.error("Watchlist check error:", e);
-                }
-            }
-        };
-        checkStatus();
-    }, [user?.uid, data?.id, mediaType, fetchWatchlist]);
+    const { data: watchlistData = [], refetch } = useWatchlistQuery(user?.uid, fetchWatchlist);
+
+    const inWatchlist = useMemo(() => {
+        if (!data?.id || !watchlistData) return false;
+        return watchlistData.some((item) => Number(item.id) === Number(data.id) || item.id === `${mediaType}-${data.id}`);
+    }, [data?.id, watchlistData, mediaType]);
 
     const handleWatchlistToggle = async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
         const nextState = !(inWatchlist || isWatchlist);
-        setInWatchlist(nextState); // Optimistic instant UI update
         setActionLoading(true);
 
         try {
@@ -48,8 +38,8 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
                 await addToWatchlist(user?.uid, data, mediaType);
                 toast.success('Added to watchlist');
             }
+            refetch();
         } catch (error) {
-            setInWatchlist(!nextState); // Revert on error
             toast.error('Failed to update watchlist');
         } finally {
             setActionLoading(false);

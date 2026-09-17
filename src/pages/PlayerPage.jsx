@@ -1,56 +1,27 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import tmdbApi from '../api/tmdbApi';
 import Spinner from '../components/Spinner';
 import Player from '../components/Player';
 import { BiArrowBack } from 'react-icons/bi';
+import { useMediaVideosQuery } from '../hooks/useTmdbQueries';
+
+const KNOWN_TYPES = ['Trailer', 'Teaser', 'Clip', 'Featurette', 'Behind the Scenes', 'Bloopers'];
 
 const PlayerPage = () => {
-    const [trailerVideos, setTrailerVideos] = useState([]);
-    const [teaserVideos, setTeaserVideos] = useState([]);
-    const [clipVideos, setClipVideos] = useState([]);
-    const [featuretteVideos, setFeaturetteVideos] = useState([]);
-    const [bts, setBts] = useState([]);
-    const [bloopers, setBloopers] = useState([]);
-    const [otherVideos, setOtherVideos] = useState([]);
-
-    const [isEmpty, setIsEmpty] = useState(false);
-    const [loading, setLoading] = useState(true);
-
     const { id, type } = useParams();
     const navigate = useNavigate();
 
-    const fetchVideos = useCallback(async () => {
-        setLoading(true);
-        try {
-            const results = await tmdbApi.getMediaVideos(type, id);
+    const { data: results = [], isLoading: loading } = useMediaVideosQuery(type, id);
 
-            if (results.length === 0) {
-                setIsEmpty(true);
-            } else {
-                setIsEmpty(false);
+    const trailerVideos = useMemo(() => results.filter((video) => video.type === 'Trailer'), [results]);
+    const teaserVideos = useMemo(() => results.filter((video) => video.type === 'Teaser'), [results]);
+    const clipVideos = useMemo(() => results.filter((video) => video.type === 'Clip'), [results]);
+    const featuretteVideos = useMemo(() => results.filter((video) => video.type === 'Featurette'), [results]);
+    const bts = useMemo(() => results.filter((video) => video.type === 'Behind the Scenes'), [results]);
+    const bloopers = useMemo(() => results.filter((video) => video.type === 'Bloopers'), [results]);
+    const otherVideos = useMemo(() => results.filter((video) => !KNOWN_TYPES.includes(video.type)), [results]);
 
-                const knownTypes = ['Trailer', 'Teaser', 'Clip', 'Featurette', 'Behind the Scenes', 'Bloopers'];
-
-                setTrailerVideos(results.filter((video) => video.type === 'Trailer'));
-                setTeaserVideos(results.filter((video) => video.type === 'Teaser'));
-                setClipVideos(results.filter((video) => video.type === 'Clip'));
-                setFeaturetteVideos(results.filter((video) => video.type === 'Featurette'));
-                setBts(results.filter((video) => video.type === 'Behind the Scenes'));
-                setBloopers(results.filter((video) => video.type === 'Bloopers'));
-                setOtherVideos(results.filter((video) => !knownTypes.includes(video.type)));
-            }
-        } catch (error) {
-            console.error('Error fetching videos:', error);
-            setIsEmpty(true);
-        } finally {
-            setLoading(false);
-        }
-    }, [id, type]);
-
-    useEffect(() => {
-        fetchVideos();
-    }, [fetchVideos]);
+    const isEmpty = !loading && results.length === 0;
 
     if (loading) {
         return (

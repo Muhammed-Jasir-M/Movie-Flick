@@ -1,44 +1,22 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import axiosInstance from '../services/axios';
+import React, { useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getImageUrl } from '../constants/constants';
 import { CastSkeleton } from './SkeletonLoaders';
 import useHorizontalScroll from '../hooks/useHorizontalScroll';
+import { useMediaCreditsQuery } from '../hooks/useTmdbQueries';
 
 const CastList = () => {
-    const [casts, setCasts] = useState([]);
-    const [crews, setCrews] = useState([]);
-    const [loading, setLoading] = useState(false);
-
     const castRef = useRef(null);
     const crewRef = useRef(null);
 
+    const { type, id } = useParams();
+    const { data: creditsData, isLoading: loading } = useMediaCreditsQuery(type, id);
+
+    const casts = creditsData?.cast || [];
+    const crews = creditsData?.crew || [];
+
     useHorizontalScroll(castRef, [casts]);
     useHorizontalScroll(crewRef, [crews]);
-
-    const { type, id } = useParams();
-
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-
-        try {
-            const response = await axiosInstance.get(`/${type}/${id}/credits`);
-
-            if (response) {
-                setCasts(response.data.cast);
-                setCrews(response.data.crew);
-            }
-
-        } catch (error) {
-            console.error("Error fetching:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [id, type]);
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
 
     return (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 text-white">
