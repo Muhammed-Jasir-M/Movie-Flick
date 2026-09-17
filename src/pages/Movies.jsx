@@ -9,6 +9,7 @@ const Movies = () => {
             <Banner mediaType={'movie'} />
 
             <CardsList endpoint={`/trending/movie/week`} title={'Trending'} isTrending type={'movie'} />
+            <CardsList endpoint="/discover/movie?with_origin_country=IN&sort_by=popularity.desc" title="Indian Cinema" type="movie" />
 
             <div className='pb-5'>
                 {

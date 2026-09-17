@@ -8,6 +8,7 @@ const Anime = () => {
             <Banner mediaType="tv" />
 
             <div className="mt-4 flex flex-col gap-6">
+                {/* Popular Sections */}
                 <CardsList
                     endpoint="/discover/tv?with_genres=16&with_original_language=ja&sort_by=popularity.desc"
                     title="Popular Anime Series"
@@ -17,19 +18,27 @@ const Anime = () => {
 
                 <CardsList
                     endpoint="/discover/movie?with_genres=16&with_original_language=ja&sort_by=popularity.desc"
-                    title="Anime Movies"
+                    title="Popular Anime Movies"
                     type="movie"
                 />
 
+                {/* Top Rated Sections */}
                 <CardsList
-                    endpoint="/discover/tv?with_genres=16,10759,10765&with_original_language=ja&sort_by=popularity.desc"
-                    title="Action & Sci-Fi Anime"
+                    endpoint="/discover/tv?with_genres=16&with_original_language=ja&sort_by=vote_average.desc&vote_count.gte=200"
+                    title="Top Rated Anime Series"
                     type="tv"
                 />
 
                 <CardsList
-                    endpoint="/discover/tv?with_genres=16&with_original_language=ja&sort_by=vote_average.desc&vote_count.gte=200"
-                    title="Top Rated Anime Series"
+                    endpoint="/discover/movie?with_genres=16&with_original_language=ja&sort_by=vote_average.desc&vote_count.gte=200"
+                    title="Top Rated Anime Movies"
+                    type="movie"
+                />
+
+                {/* Anime Genres & Sub-Categories */}
+                <CardsList
+                    endpoint="/discover/tv?with_genres=16,10759,10765&with_original_language=ja&sort_by=popularity.desc"
+                    title="Action & Sci-Fi Anime"
                     type="tv"
                 />
 
@@ -46,9 +55,9 @@ const Anime = () => {
                 />
 
                 <CardsList
-                    endpoint="/discover/movie?with_genres=16&with_original_language=ja&sort_by=vote_average.desc&vote_count.gte=200"
-                    title="Top Rated Anime Movies"
-                    type="movie"
+                    endpoint="/discover/tv?with_genres=16,18&with_original_language=ja&sort_by=popularity.desc"
+                    title="Drama & Romance Anime"
+                    type="tv"
                 />
 
                 <CardsList
