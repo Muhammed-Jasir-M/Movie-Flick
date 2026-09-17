@@ -118,9 +118,15 @@ const ExplorePage = () => {
                     ))}
                 </div>
             ) : (
-                <div className="py-20 text-center">
+                <div className="py-20 text-center flex flex-col items-center">
                     <h2 className="text-xl font-bold text-white mb-2">No content available</h2>
-                    <p className="text-sm text-gray-400">Try exploring a different category or genre.</p>
+                    <p className="text-sm text-gray-400 mb-6">Try exploring a different category or retry loading.</p>
+                    <button
+                        onClick={fetchData}
+                        className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl text-sm transition-all shadow-lg hover:shadow-red-600/30 cursor-pointer"
+                    >
+                        Retry
+                    </button>
                 </div>
             )}
 

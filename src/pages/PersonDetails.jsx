@@ -58,8 +58,17 @@ const PersonDetails = () => {
 
     if (!person) {
         return (
-            <div className="w-full min-h-screen flex items-center justify-center">
-                <h2 className="text-xl text-white">Person details not found.</h2>
+            <div className="w-full min-h-screen flex items-center justify-center bg-[#0f172a] px-4 pt-20 pb-12">
+                <div className="p-6 sm:p-8 bg-[#14213d]/70 backdrop-blur-md rounded-2xl border border-gray-800 shadow-2xl text-center max-w-md w-full">
+                    <h2 className="text-xl font-bold text-white mb-2">Person Details Not Found</h2>
+                    <p className="text-sm text-gray-400 mb-6">We couldn't find information for this person.</p>
+                    <button
+                        onClick={() => window.history.back()}
+                        className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl text-sm transition-all shadow-lg hover:shadow-red-600/30"
+                    >
+                        Go Back
+                    </button>
+                </div>
             </div>
         );
     }

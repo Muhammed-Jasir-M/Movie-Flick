@@ -1,18 +1,28 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { BiErrorCircle } from 'react-icons/bi';
 
 const NotFound = () => {
     return (
-        <section className="pt-20 px-5 h-[700px] md:h-screen flex flex-col justify-center items-center bg-[#14213d] w-full text-white">
-            <h1 className="text-5xl font-bold mb-4">404</h1>
-            <p className="text-xl mb-6 text-center">Oops! The page you're looking for doesn't exist.</p>
-            <Link
-                to="/"
-                className="py-2 px-5 bg-red-600 hover:bg-red-700 text-white text-lg rounded-md"
-            >
-                Go Back to Home
-            </Link>
+        <section className="pt-24 pb-16 px-4 min-h-screen flex flex-col justify-center items-center bg-[#0f172a] w-full text-white">
+            <div className="p-8 sm:p-12 bg-[#14213d]/70 backdrop-blur-md rounded-2xl border border-gray-800 shadow-2xl text-center max-w-lg w-full flex flex-col items-center">
+                <div className="w-16 h-16 bg-red-600/20 text-red-500 rounded-full flex items-center justify-center mb-4 border border-red-500/30">
+                    <BiErrorCircle size={36} />
+                </div>
+                <h1 className="text-6xl font-black text-white mb-2 tracking-tight">404</h1>
+                <h2 className="text-xl font-bold text-gray-200 mb-2">Page Not Found</h2>
+                <p className="text-sm text-gray-400 mb-8 max-w-sm">
+                    Oops! The page you're looking for doesn't exist or may have been moved.
+                </p>
+                <Link
+                    to="/"
+                    className="py-3 px-6 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl text-sm transition-all shadow-lg hover:shadow-red-600/30"
+                >
+                    Back to Home
+                </Link>
+            </div>
         </section>
     );
 };
 
-export default NotFound
+export default NotFound;

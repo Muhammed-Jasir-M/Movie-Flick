@@ -11,10 +11,10 @@ import { toast } from 'react-toastify';
 import { DetailsSkeleton } from './SkeletonLoaders';
 
 const DetailsInfo = () => {
-    const [mediaData, setMediaData] = useState({});
-    const [loading, setLoading] = useState(false);
+    const [mediaData, setMediaData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
     const [isInWatchlist, setIsInWatchlist] = useState(false);
-    console.log(typeof mediaData?.budget, typeof mediaData?.revenue);
 
     const { addToWatchlist, removeFromWatchlist, fetchWatchlist } = useWatchlistContext();
     const { user } = useAuthContext();
@@ -26,12 +26,18 @@ const DetailsInfo = () => {
 
     const fetchData = useCallback(async () => {
         setLoading(true);
+        setError(false);
 
         try {
             const response = await axiosInstance.get(`/${mediaType}/${id}`);
-            setMediaData(response.data);
-        } catch (error) {
-            console.error("Error fetching:", error);
+            if (response.data && response.data.id) {
+                setMediaData(response.data);
+            } else {
+                setError(true);
+            }
+        } catch (err) {
+            console.error("Error fetching media details:", err);
+            setError(true);
         } finally {
             setLoading(false);
         }
@@ -79,6 +85,33 @@ const DetailsInfo = () => {
 
     if (loading) {
         return <DetailsSkeleton />;
+    }
+
+    if (error || !mediaData) {
+        return (
+            <div className="relative w-full bg-[#0f172a] text-white min-h-[500px] flex items-center justify-center px-4 pt-20 pb-12">
+                <div className="p-6 sm:p-8 bg-[#14213d]/70 backdrop-blur-md rounded-2xl border border-gray-800 shadow-2xl text-center max-w-md w-full">
+                    <div className="w-14 h-14 bg-red-600/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/30">
+                        <BiCameraMovie className="text-2xl" />
+                    </div>
+                    <h2 className="text-xl font-extrabold text-white mb-2">Something Went Wrong</h2>
+                    <p className="text-sm text-gray-400 mb-6">
+                        We couldn't load the details for this title. Please check your internet connection or try again.
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-3">
+                        <button
+                            onClick={fetchData}
+                            className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-red-600/30 text-sm cursor-pointer"
+                        >
+                            Retry
+                        </button>
+                        <Link to="/" className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-gray-200 font-semibold rounded-xl border border-gray-700 transition-all text-sm">
+                            Return to Home
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (
