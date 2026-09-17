@@ -18,16 +18,20 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
 
     const { data: watchlistData = [], refetch } = useWatchlistQuery(user?.uid, fetchWatchlist);
 
+    const [optimisticInWatchlist, setOptimisticInWatchlist] = useState(null);
+
     const inWatchlist = useMemo(() => {
+        if (optimisticInWatchlist !== null) return optimisticInWatchlist;
         if (!data?.id || !watchlistData) return false;
         return watchlistData.some((item) => Number(item.id) === Number(data.id) || item.id === `${mediaType}-${data.id}`);
-    }, [data?.id, watchlistData, mediaType]);
+    }, [data?.id, watchlistData, mediaType, optimisticInWatchlist]);
 
     const handleWatchlistToggle = async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
         const nextState = !(inWatchlist || isWatchlist);
+        setOptimisticInWatchlist(nextState);
         setActionLoading(true);
 
         try {
@@ -38,10 +42,12 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
                 await addToWatchlist(user?.uid, data, mediaType);
                 toast.success('Added to watchlist');
             }
-            refetch();
+            await refetch();
         } catch (error) {
+            setOptimisticInWatchlist(!nextState);
             toast.error('Failed to update watchlist');
         } finally {
+            setOptimisticInWatchlist(null);
             setActionLoading(false);
         }
     };

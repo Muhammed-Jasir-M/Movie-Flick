@@ -20,17 +20,21 @@ const DetailsInfo = () => {
     const { user } = useAuthContext();
     const { data: watchlistData = [], refetch: refetchWatchlist } = useWatchlistQuery(user?.uid, fetchWatchlist);
 
+    const [optimisticInWatchlist, setOptimisticInWatchlist] = useState(null);
+
     const isInWatchlist = useMemo(() => {
+        if (optimisticInWatchlist !== null) return optimisticInWatchlist;
         if (!mediaData?.id || !watchlistData) return false;
         return watchlistData.some(item => Number(item.id) === Number(mediaData.id) || item.id === `${type}-${mediaData.id}`);
-    }, [mediaData?.id, watchlistData, type]);
+    }, [mediaData?.id, watchlistData, type, optimisticInWatchlist]);
 
     const runtime = mediaData?.runtime || mediaData?.last_episode_to_air?.runtime || mediaData?.episode_run_time?.[0];
     const [watchlistLoading, setWatchlistLoading] = useState(false);
 
     const handleClick = async () => {
-        setWatchlistLoading(true);
         const nextState = !isInWatchlist;
+        setOptimisticInWatchlist(nextState);
+        setWatchlistLoading(true);
 
         try {
             if (nextState) {
@@ -40,11 +44,13 @@ const DetailsInfo = () => {
                 await removeFromWatchlist(user?.uid, mediaData, type);
                 toast.success('Removed from watchlist');
             }
-            refetchWatchlist();
+            await refetchWatchlist();
         } catch (error) {
             console.error('Error updating watchlist:', error);
+            setOptimisticInWatchlist(!nextState);
             toast.error('Failed to update watchlist');
         } finally {
+            setOptimisticInWatchlist(null);
             setWatchlistLoading(false);
         }
     };

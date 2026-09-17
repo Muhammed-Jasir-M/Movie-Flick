@@ -83,81 +83,90 @@ const Banner = ({ mediaType }) => {
                 }}
                 modules={[Keyboard, Autoplay, Pagination, Navigation]}
             >
-                {trendingData.map((data, index) => (
-                    <SwiperSlide key={index}>
-                        <div className="relative min-w-full h-[535px] sm:h-[675px] md:h-[610px] transition-all duration-300 ease-linear">
-                            <img
-                                src={getImageUrl('original', data?.backdrop_path)}
-                                alt={data?.title || data?.name || 'banner-image'}
-                                className="w-full h-full object-cover bg-[#0a1128] cursor-pointer rounded-xl"
-                                loading="lazy"
-                            />
-
-                            <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent"></div>
-
-                            <div className="absolute bottom-16 sm:bottom-20 flex flex-col gap-4 max-w-full md:max-w-xl mx-5 md:mx-16 text-center md:text-left z-10">
-                                {/* Genre Badges */}
-                                {getGenreNames(data?.genre_ids).length > 0 && (
-                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                                        {getGenreNames(data?.genre_ids).map((genreName, idx) => (
-                                            <span
-                                                key={idx}
-                                                className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-900/80 text-gray-200 border border-slate-700/60 backdrop-blur-md shadow-sm"
-                                            >
-                                                {genreName}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-
-                                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg leading-tight">
-                                    {data?.title || data?.name}
-                                </h1>
-
-                                <p className="text-sm md:text-base text-gray-200 line-clamp-3 md:line-clamp-4 text-ellipsis drop-shadow">
-                                    {data?.overview}
-                                </p>
-
-                                <div className="flex gap-4 text-sm font-semibold justify-center md:justify-start text-white items-center">
-                                    <p className="flex items-center gap-1.5 drop-shadow-md">
-                                        <FaStar className="text-yellow-400" />
-                                        {data.vote_average > 0 ? Number(data?.vote_average).toFixed(1) : 'N/A'}
-                                    </p>
-
-                                    <p className="flex items-center gap-1.5 drop-shadow-md">
-                                        <FaRegCalendarAlt />
-                                        {moment(data?.release_date || data?.first_air_date).format('YYYY')}
-                                    </p>
-                                </div>
-
-                                <div className="flex gap-3 justify-center md:justify-start">
-                                    <Link to={`/player/${data?.media_type || mediaType || 'movie'}/${data?.id}`}>
-                                        <button className="flex items-center px-6 sm:px-8 py-2.5 gap-2 text-base font-bold cursor-pointer bg-white text-black rounded-xl hover:bg-gray-200 whitespace-nowrap hover:scale-105 transition-all duration-300 ease-in-out shadow-lg">
-                                            <FaPlay />
-                                            Play
-                                        </button>
-                                    </Link>
-
-                                    <Link to={`/${data?.media_type || mediaType || 'movie'}/${data?.id}`}>
-                                        <button className="flex items-center px-5 sm:px-6 py-2.5 gap-2 text-base font-bold cursor-pointer bg-gray-600/70 text-white rounded-xl hover:bg-gray-600/90 whitespace-nowrap hover:scale-105 transition-all duration-300 ease-in-out backdrop-blur-md">
-                                            <MdInfoOutline className="text-xl" />
-                                            More Info
-                                        </button>
-                                    </Link>
-                                </div>
-                            </div>
-
-                            <div className="absolute bottom-20 right-24 hidden lg:block min-w-[240px] max-w-[240px] z-10">
+                {trendingData.map((data, index) => {
+                    const itemType = data?.media_type || (data?.first_air_date ? 'tv' : 'movie') || mediaType || 'movie';
+                    return (
+                        <SwiperSlide key={index}>
+                            <div className="relative min-w-full h-[535px] sm:h-[675px] md:h-[610px] transition-all duration-300 ease-linear">
                                 <img
-                                    src={getImageUrl('w500', data?.poster_path)}
-                                    alt={data?.title || data?.name || 'poster-image'}
-                                    className="w-full h-[360px] object-cover rounded-xl shadow-2xl border border-gray-800"
+                                    src={getImageUrl('original', data?.backdrop_path)}
+                                    alt={data?.title || data?.name || 'banner-image'}
+                                    className="w-full h-full object-cover bg-[#0a1128] rounded-xl"
+                                    loading="lazy"
                                 />
+
+                                <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+                                <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent"></div>
+
+                                <div className="absolute bottom-16 sm:bottom-20 flex flex-col gap-4 max-w-full md:max-w-xl mx-5 md:mx-16 text-center md:text-left z-10">
+                                    {/* Genre Badges */}
+                                    {getGenreNames(data?.genre_ids).length > 0 && (
+                                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                                            {getGenreNames(data?.genre_ids).map((genreName, idx) => (
+                                                <span
+                                                    key={idx}
+                                                    className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-900/80 text-gray-200 border border-slate-700/60 backdrop-blur-md shadow-sm"
+                                                >
+                                                    {genreName}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg leading-tight">
+                                        {data?.title || data?.name}
+                                    </h1>
+
+                                    <p className="text-sm md:text-base text-gray-200 line-clamp-3 md:line-clamp-4 text-ellipsis drop-shadow">
+                                        {data?.overview}
+                                    </p>
+
+                                    <div className="flex gap-4 text-sm font-semibold justify-center md:justify-start text-white items-center">
+                                        <p className="flex items-center gap-1.5 drop-shadow-md">
+                                            <FaStar className="text-yellow-400" />
+                                            {data.vote_average > 0 ? Number(data?.vote_average).toFixed(1) : 'N/A'}
+                                        </p>
+
+                                        <p className="flex items-center gap-1.5 drop-shadow-md">
+                                            <FaRegCalendarAlt />
+                                            {moment(data?.release_date || data?.first_air_date).format('YYYY')}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex gap-3 justify-center md:justify-start">
+                                        <Link 
+                                            to={`/player/${itemType}/${data?.id}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <button className="flex items-center px-6 sm:px-8 py-2.5 gap-2 text-base font-bold cursor-pointer bg-white text-black rounded-xl hover:bg-gray-200 whitespace-nowrap hover:scale-105 transition-all duration-300 ease-in-out shadow-lg">
+                                                <FaPlay />
+                                                Play
+                                            </button>
+                                        </Link>
+
+                                        <Link 
+                                            to={`/${itemType}/${data?.id}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <button className="flex items-center px-5 sm:px-6 py-2.5 gap-2 text-base font-bold cursor-pointer bg-gray-600/70 text-white rounded-xl hover:bg-gray-600/90 whitespace-nowrap hover:scale-105 transition-all duration-300 ease-in-out backdrop-blur-md">
+                                                <MdInfoOutline className="text-xl" />
+                                                More Info
+                                            </button>
+                                        </Link>
+                                    </div>
+                                </div>
+
+                                <div className="absolute bottom-20 right-24 hidden lg:block min-w-[240px] max-w-[240px] z-10">
+                                    <img
+                                        src={getImageUrl('w500', data?.poster_path)}
+                                        alt={data?.title || data?.name || 'poster-image'}
+                                        className="w-full h-[360px] object-cover rounded-xl shadow-2xl border border-gray-800"
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    </SwiperSlide>
-                ))}
+                        </SwiperSlide>
+                    );
+                })}
             </Swiper>
 
             {/* Custom Banner Side Navigation Buttons */}
