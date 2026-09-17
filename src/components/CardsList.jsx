@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import axiosInstance from '../services/axios';
 import PosterCard from './PosterCard';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
@@ -46,78 +46,84 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
         }
     }, [genreId, fetchByCategory, fetchByGenreId]);
 
-    const sliderRef = useRef(null)
+    const sliderRef = useRef(null);
 
     const handleScrollLeft = () => {
         if (sliderRef.current) {
             sliderRef.current.scrollBy({
-                left: -sliderRef.current.offsetWidth / 2,
+                left: -sliderRef.current.offsetWidth * 0.75,
                 behavior: "smooth"
-            })
+            });
         }
-    }
+    };
 
     const handleScrollRight = () => {
         if (sliderRef.current) {
             sliderRef.current.scrollBy({
-                left: sliderRef.current.offsetWidth / 2,
+                left: sliderRef.current.offsetWidth * 0.75,
                 behavior: "smooth"
-            })
+            });
         }
-    }
+    };
 
     return (
-        <section className='flex flex-col group px-2 sm:px-4 md:px-8 lg:px-12'>
+        <section className="flex flex-col group relative px-2 sm:px-4 md:px-8 lg:px-12 my-3">
             {data.length > 0 && (
-                <div className='flex justify-between items-center bg-[#14213d] py-2 px-3 sm:px-4 md:px-6 rounded-md my-3'>
-                    <h2 className='text-[18px] sm:text-xl md:text-2xl font-semibold pt-3 mb-3 whitespace-nowrap'>
+                <div className="flex justify-between items-center bg-[#14213d] py-3 px-4 sm:px-6 rounded-xl mb-3 shadow-md">
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-wide">
                         {title && title}
                     </h2>
 
-                    <Link to={`/explore/${type || 'all'}/${title.toLowerCase().replace(/\s+/g, '-')}`} state={{endpoint, genreId}}>
-                        <h5 className='text-xs md:text-lg font-medium border-2 rounded-full px-2 py-1 md:px-3 md:py-1 cursor-pointer whitespace-nowrap hover:bg-white hover:text-black'>
+                    <Link to={`/explore/${type || 'all'}/${title.toLowerCase().replace(/\s+/g, '-')}`} state={{ endpoint, genreId }}>
+                        <h5 className="text-xs md:text-sm font-semibold border border-white/30 rounded-full px-3.5 py-1.5 cursor-pointer whitespace-nowrap hover:bg-white hover:text-black transition-all shadow-sm">
                             View more
                         </h5>
                     </Link>
                 </div>
             )}
 
-            {
-                loading ? (
-                    <SliderSkeleton count={6} />
-                ) : (
-                    <div className='flex flex-col'>
-                        <div className='flex gap-5 overflow-x-auto scrollbar-hide mx-2 md:mx-3 px-1.5 py-2 md:py-3 overflow-hidden' ref={sliderRef}>
-                            {data.length > 0 && data.map((data, index) => (
+            {loading ? (
+                <SliderSkeleton count={6} />
+            ) : (
+                <div className="relative group/slider">
+                    {/* Left Overlay Scroll Arrow */}
+                    <button
+                        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-black/60 hover:bg-black/90 text-white p-2.5 rounded-r-xl opacity-0 group-hover/slider:opacity-100 transition-all duration-300 backdrop-blur-md cursor-pointer border-y border-r border-white/20 shadow-xl"
+                        onClick={handleScrollLeft}
+                        aria-label="Scroll left"
+                    >
+                        <BiChevronLeft size={28} />
+                    </button>
+
+                    {/* Movie Cards Container */}
+                    <div
+                        className="flex gap-4 overflow-x-auto scrollbar-hide py-2 md:py-3 scroll-smooth"
+                        ref={sliderRef}
+                    >
+                        {data.length > 0 &&
+                            data.map((item, index) => (
                                 <PosterCard
-                                    key={index}
-                                    data={data}
+                                    key={`${item.id}-${index}`}
+                                    data={item}
                                     index={index + 1}
                                     isTrending={isTrending}
-                                    type={data?.media_type || type} />
+                                    type={item?.media_type || type || 'movie'}
+                                />
                             ))}
-                        </div>
-
-                        <div className='hidden group-hover:flex justify-center items-center gap-5 pt-3'>
-                            <button
-                                className={`px-1 py-1 bg-gray-500/70 hover:bg-gray-500 rounded`}
-                                onClick={handleScrollLeft}
-                            >
-                                <BiChevronLeft size={28} />
-                            </button>
-
-                            <button
-                                className={`px-1 py-1 bg-gray-500/70 hover:bg-gray-500 rounded`}
-                                onClick={handleScrollRight}
-                            >
-                                <BiChevronRight size={28} />
-                            </button>
-                        </div>
                     </div>
-                )
-            }
-        </section>
-    )
-}
 
-export default CardsList
+                    {/* Right Overlay Scroll Arrow */}
+                    <button
+                        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-black/60 hover:bg-black/90 text-white p-2.5 rounded-l-xl opacity-0 group-hover/slider:opacity-100 transition-all duration-300 backdrop-blur-md cursor-pointer border-y border-l border-white/20 shadow-xl"
+                        onClick={handleScrollRight}
+                        aria-label="Scroll right"
+                    >
+                        <BiChevronRight size={28} />
+                    </button>
+                </div>
+            )}
+        </section>
+    );
+};
+
+export default CardsList;

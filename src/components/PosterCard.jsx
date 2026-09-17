@@ -1,78 +1,123 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import { getImageUrl } from '../constants/constants';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FaBookmark } from 'react-icons/fa';
+import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import { useWatchlistContext } from '../store/watchlistContext';
+import { useAuthContext } from '../store/authContext';
 
-const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, user }) => {
-    const { removeFromWatchlist } = useWatchlistContext();
+const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist }) => {
+    const { user } = useAuthContext();
+    const { addToWatchlist, removeFromWatchlist, fetchWatchlist } = useWatchlistContext();
+    const [inWatchlist, setInWatchlist] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
 
-    const handleClick = async () => {
-        try {
-            await removeFromWatchlist(user.uid, data, type);
-            toast.success('removed from watchlist');
-        } catch (error) {
-            console.log('Error removing from watchlist:', error);
+    const mediaType = data?.media_type || type || 'movie';
+
+    // Check if item is already in watchlist
+    useEffect(() => {
+        const checkStatus = async () => {
+            if (user?.uid && data?.id) {
+                try {
+                    const list = await fetchWatchlist(user.uid);
+                    const exists = list.some((item) => item.id === data.id);
+                    setInWatchlist(exists);
+                } catch (e) {
+                    console.error("Watchlist check error:", e);
+                }
+            }
+        };
+        checkStatus();
+    }, [user, data?.id, fetchWatchlist]);
+
+    const handleWatchlistToggle = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!user) {
+            toast.error('Please log in to add to your watchlist');
+            return;
         }
-    }
+
+        setActionLoading(true);
+        try {
+            if (inWatchlist || isWatchlist) {
+                await removeFromWatchlist(user.uid, data, mediaType);
+                setInWatchlist(false);
+                toast.success('Removed from watchlist');
+            } else {
+                await addToWatchlist(user.uid, data, mediaType);
+                setInWatchlist(true);
+                toast.success('Added to watchlist');
+            }
+        } catch (error) {
+            toast.error('Failed to update watchlist');
+        } finally {
+            setActionLoading(false);
+        }
+    };
 
     return (
-        <Link to={`/${type}/${data?.id}`}>
-            <div className={`relative ${isSmall ? 'min-w-[150px] max-w-[150px] h-[230px] sm:min-w-[200px] sm:max-w-[200px] sm:h-[300px] md:min-w-[230px] md:max-w-[230px] md:h-[350px]' : 'min-w-[230px] max-w-[230px] h-[350px]'} cursor-pointer rounded-md hover:scale-105 transition.all ease-in-out duration-300 hover:border-2 border-white overflow-hidden`}>
-                {
-                    data?.poster_path ? (
-                        <img
-                            src={getImageUrl('w500', data?.poster_path)}
-                            alt={data?.title || data?.name || 'movie-poster'}
-                            className={`${isSmall ? 'h-[180px] sm:h-[250px] md:h-[300px]' : 'h-[300px]'} w-full object-cover rounded-t-md shadow-md bg-[#14213d]`}
-                        />
-                    ) : (
-                        <div className={`${isSmall ? 'h-[180px] sm:h-[250px] md:h-[300px]' : 'h-[300px]'} w-full flex justify-center items-center bg-[#14213d] rounded-t-md shadow-md`}>
-                            No Image found
-                        </div>
-                    )
-                }
+        <Link to={`/${mediaType}/${data?.id}`}>
+            <div className={`group/card relative ${isSmall ? 'min-w-[150px] max-w-[150px] h-[230px] sm:min-w-[190px] sm:max-w-[190px] sm:h-[290px] md:min-w-[210px] md:max-w-[210px] md:h-[320px]' : 'min-w-[210px] max-w-[210px] h-[320px]'} cursor-pointer rounded-xl hover:scale-105 transition-all duration-300 ease-in-out border border-transparent hover:border-gray-700 shadow-lg overflow-hidden bg-[#14213d]`}>
+                
+                {/* Poster Image */}
+                {data?.poster_path ? (
+                    <img
+                        src={getImageUrl('w500', data?.poster_path)}
+                        alt={data?.title || data?.name || 'movie-poster'}
+                        className={`${isSmall ? 'h-[175px] sm:h-[230px] md:h-[260px]' : 'h-[260px]'} w-full object-cover rounded-t-xl bg-[#14213d]`}
+                        loading="lazy"
+                    />
+                ) : (
+                    <div className={`${isSmall ? 'h-[175px] sm:h-[230px] md:h-[260px]' : 'h-[260px]'} w-full flex justify-center items-center bg-[#14213d] rounded-t-xl text-xs text-gray-400 text-center px-2`}>
+                        No Image found
+                    </div>
+                )}
 
-                <div className='bg-black/70 px-2.5 py-0.5 rounded-b-md w-full'>
-                    <h3 className='font-semibold text-base text-ellipsis line-clamp-1'>
+                {/* Info Footer */}
+                <div className="bg-[#0f172a] px-3 py-2 rounded-b-xl w-full flex flex-col justify-between">
+                    <h3 className="font-bold text-sm text-white text-ellipsis line-clamp-1 group-hover/card:text-red-400 transition-colors">
                         {data?.name || data?.title}
                     </h3>
 
-                    <div className='flex justify-between text-sm text-gray-400'>
-                        <p>
-                            {moment(data.release_date || data.first_air_date).format('YYYY')}
-                        </p>
+                    <div className="flex justify-between items-center text-xs text-gray-400 mt-1 font-medium">
+                        <span>
+                            {moment(data.release_date || data.first_air_date).format('YYYY') !== 'Invalid date'
+                                ? moment(data.release_date || data.first_air_date).format('YYYY')
+                                : ''}
+                        </span>
 
-                        <p className=''>
+                        <span className="bg-slate-800 text-yellow-400 px-1.5 py-0.5 rounded text-[11px] font-bold">
                             {data?.vote_average > 0 ? Number(data.vote_average).toFixed(1) : 'N/A'}
-                        </p>
+                        </span>
                     </div>
                 </div>
 
-                <div className='absolute top-2'>
-                    {
-                        isTrending && (
-                            <div className='bg-black/80 px-4 py-1 rounded-r-full backdrop-blur-3xl'>
-                                #{index} Trending
-                            </div>
-                        )
-                    }
-                </div>
+                {/* Trending Badge */}
+                {isTrending && (
+                    <div className="absolute top-2 left-0 bg-red-600/90 text-white font-bold text-xs px-3 py-1 rounded-r-full shadow-md backdrop-blur-sm z-10">
+                        #{index} Trending
+                    </div>
+                )}
 
-                <div className='absolute top-2.5 right-2.5'>
-                    {
-                        isWatchlist && (
-                            <button className='p-2.5 rounded-[50%] bg-gray-900 cursor-pointer' onClick={handleClick}>
-                                <FaBookmark />
-                            </button>
-                        )
-                    }
-                </div>
+                {/* Hover Quick Watchlist Button */}
+                <button
+                    onClick={handleWatchlistToggle}
+                    disabled={actionLoading}
+                    title={inWatchlist || isWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                    className={`absolute top-2.5 right-2.5 p-2 rounded-full backdrop-blur-md transition-all duration-200 z-10 cursor-pointer shadow-md ${
+                        inWatchlist || isWatchlist
+                            ? 'bg-red-600 text-white opacity-100 scale-100'
+                            : 'bg-black/60 hover:bg-red-600 text-white opacity-0 group-hover/card:opacity-100 scale-95 hover:scale-110'
+                    }`}
+                >
+                    {inWatchlist || isWatchlist ? <FaBookmark size={13} /> : <FaRegBookmark size={13} />}
+                </button>
             </div>
         </Link>
-    )
-}
+    );
+};
 
-export default PosterCard
+export default PosterCard;
