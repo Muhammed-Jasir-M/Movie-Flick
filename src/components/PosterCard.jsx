@@ -117,12 +117,7 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
                     </div>
                 )}
 
-                {/* Media Type Badge (when not trending) */}
-                {!isTrending && (
-                    <div className="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-md text-gray-200 border border-gray-700/60 font-semibold text-[10px] uppercase px-2 py-0.5 rounded-md shadow-md z-10">
-                        {mediaType === 'tv' ? 'TV Show' : 'Movie'}
-                    </div>
-                )}
+
 
                 {/* Hover Quick Watchlist Button */}
                 <button
