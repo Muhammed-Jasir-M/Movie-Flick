@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../services/axios';
 import { getImageUrl } from '../constants/constants';
-import Spinner from '../components/Spinner';
 import PosterCard from '../components/PosterCard';
+import { PersonDetailsSkeleton } from '../components/SkeletonLoaders';
 import moment from 'moment';
 
 const PersonDetails = () => {
@@ -41,11 +41,7 @@ const PersonDetails = () => {
     }, [fetchPersonDetails]);
 
     if (loading) {
-        return (
-            <div className="w-full min-h-screen flex items-center justify-center">
-                <Spinner borderColor={'border-white'} />
-            </div>
-        );
+        return <PersonDetailsSkeleton />;
     }
 
     if (!person) {

@@ -12,7 +12,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { Keyboard, Autoplay, Pagination, Navigation } from 'swiper/modules';
 
-import Spinner from './Spinner'
+import { BannerSkeleton } from './SkeletonLoaders';
 import moment from 'moment';
 
 const Banner = (mediaType) => {
@@ -57,11 +57,7 @@ const Banner = (mediaType) => {
     }, [path]);
 
     if (loading) {
-        return (
-            <div className='w-full h-[535px] sm:h-[675px] md:h-[610px] flex items-center justify-center'>
-                <Spinner borderColor={'border-white'} />
-            </div>
-        )
+        return <BannerSkeleton />;
     }
 
     return (

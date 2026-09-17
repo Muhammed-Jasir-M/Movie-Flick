@@ -5,7 +5,7 @@ import { MovieGenres } from '../constants/GenreList'
 
 const Movies = () => {
     return (
-        <section>
+        <section className='min-h-screen'>
             <Banner mediaType={'movie'} />
 
             <CardsList endpoint={`/trending/movie/week`} title={'Trending'} isTrending type={'movie'} />

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import axiosInstance from '../services/axios';
 import { Link, useParams } from 'react-router-dom';
 import { getImageUrl } from '../constants/constants';
-import Spinner from './Spinner';
+import { CastSkeleton } from './SkeletonLoaders';
 
 const CastList = () => {
     const [casts, setCasts] = useState([]);
@@ -38,8 +38,8 @@ const CastList = () => {
         <section className='px-1'>
             {
                 loading ? (
-                    <div className="flex justify-center items-center h-60 mt-2 md:mt-[120px]">
-                        <Spinner borderColor={'border-white'} />
+                    <div className="pt-2 md:pt-[120px]">
+                        <CastSkeleton count={8} />
                     </div>
                 ) : (
                     <div className='pt-2 md:pt-[148px] overflow-hidden'>

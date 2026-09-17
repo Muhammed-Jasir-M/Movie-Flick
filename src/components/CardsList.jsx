@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import axiosInstance from '../services/axios';
 import PosterCard from './PosterCard';
-import Spinner from './Spinner';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
+import { SliderSkeleton } from './SkeletonLoaders';
 
 const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
     const [data, setData] = useState([]);
@@ -84,9 +84,7 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
 
             {
                 loading ? (
-                    <div className='w-full h-[360px] flex items-center justify-center'>
-                        <Spinner borderColor={'border-white'} />
-                    </div>
+                    <SliderSkeleton count={6} />
                 ) : (
                     <div className='flex flex-col'>
                         <div className='flex gap-5 overflow-x-auto scrollbar-hide mx-2 md:mx-3 px-1.5 py-2 md:py-3 overflow-hidden' ref={sliderRef}>

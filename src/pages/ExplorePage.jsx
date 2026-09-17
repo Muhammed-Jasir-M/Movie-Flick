@@ -3,6 +3,7 @@ import { useLocation, useParams } from 'react-router-dom'
 import axiosInstance from '../services/axios';
 import Spinner from '../components/Spinner';
 import PosterCard from '../components/PosterCard';
+import { PosterCardSkeleton } from '../components/SkeletonLoaders';
 
 const ExplorePage = () => {
     const { state } = useLocation();
@@ -95,9 +96,7 @@ const ExplorePage = () => {
             <div className='pt-20'>
                 {
                     loading ? (
-                        <div className='w-full h-[500px] flex items-center justify-center'>
-                            <Spinner borderColor={'border-white'} />
-                        </div>
+                        <PosterCardSkeleton count={12} />
                     ) : (
                         <>
                             <div className='text-2xl md:text-3xl font-bold capitalize text-center py-3'>

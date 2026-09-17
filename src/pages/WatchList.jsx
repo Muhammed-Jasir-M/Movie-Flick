@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useWatchlistContext } from '../store/watchlistContext';
 import { useAuthContext } from '../store/authContext';
 import PosterCard from '../components/PosterCard';
-import Spinner from '../components/Spinner';
+import { PosterCardSkeleton } from '../components/SkeletonLoaders';
 
 const WatchList = () => {
     const [watchlist, setWatchlist] = useState([]);
@@ -31,8 +31,9 @@ const WatchList = () => {
 
     if (loading) {
         return (
-            <div className='w-full min-h-screen flex items-center justify-center'>
-                <Spinner borderColor={'border-white'} />
+            <div className='container mx-auto min-h-screen pt-20'>
+                <h1 className='text-3xl font-bold py-3 text-center'>Watchlist</h1>
+                <PosterCardSkeleton count={12} />
             </div>
         );
     }

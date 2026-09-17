@@ -23,41 +23,43 @@ import PersonDetails from './pages/PersonDetails'
 
 const App = () => {
     return (
-        <main className='2xl:container mx-auto'>
+        <main className='2xl:container mx-auto min-h-screen flex flex-col justify-between'>
             <BrowserRouter>
                 <Header />
                 <ScrollToTop />
-                <Routes>
-                    <Route path='/' element={<Home />} />
-                    <Route path='/movies' element={<Movies />} />
-                    <Route path='/tv' element={<Tv />} />
-                    <Route path='/search' element={<SearchPage />} />
-                    <Route path='/:type/:id' element={<DetailsPage />} />
-                    <Route path='/person/:id' element={<PersonDetails />} />
-                    <Route path='/player/:type/:id' element={<PlayerPage />} />
-                    <Route path='/explore/:type/:title' element={<ExplorePage />} />
-                    <Route path='/signup' element={<SignupPage />} />
-                    <Route path='/login' element={<LoginPage />} />
-                    <Route path='/reset' element={<ResetPassword />} />
-                    <Route path='/about' element={<AboutPage />} />
-                    <Route
-                        path="/profile"
-                        element={
-                            <ProtectedRoute>
-                                <Profile />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/watchlist"
-                        element={
-                            <ProtectedRoute>
-                                <WatchList />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route path='*' element={<NotFound />} />
-                </Routes>
+                <div className='flex-1'>
+                    <Routes>
+                        <Route path='/' element={<Home />} />
+                        <Route path='/movies' element={<Movies />} />
+                        <Route path='/tv' element={<Tv />} />
+                        <Route path='/search' element={<SearchPage />} />
+                        <Route path='/:type/:id' element={<DetailsPage />} />
+                        <Route path='/person/:id' element={<PersonDetails />} />
+                        <Route path='/player/:type/:id' element={<PlayerPage />} />
+                        <Route path='/explore/:type/:title' element={<ExplorePage />} />
+                        <Route path='/signup' element={<SignupPage />} />
+                        <Route path='/login' element={<LoginPage />} />
+                        <Route path='/reset' element={<ResetPassword />} />
+                        <Route path='/about' element={<AboutPage />} />
+                        <Route
+                            path="/profile"
+                            element={
+                                <ProtectedRoute>
+                                    <Profile />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/watchlist"
+                            element={
+                                <ProtectedRoute>
+                                    <WatchList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route path='*' element={<NotFound />} />
+                    </Routes>
+                </div>
                 <Footer />
                 <BottomNavbar />
             </BrowserRouter>

@@ -5,7 +5,7 @@ import { TvShowGenres } from '../constants/GenreList'
 
 const Tv = () => {
     return (
-        <section>
+        <section className='min-h-screen'>
             <Banner mediaType={'tv'} />
 
             <CardsList endpoint={`/trending/tv/week`} title={'Trending'} isTrending type={'tv'} />

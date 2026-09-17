@@ -5,10 +5,10 @@ import { getImageUrl } from '../constants/constants';
 import { FaBookmark, FaPlay, FaRegBookmark, FaRegCalendarAlt, FaRegClock, FaStar } from 'react-icons/fa';
 import moment from 'moment';
 import { BiCameraMovie } from 'react-icons/bi';
-import Spinner from './Spinner';
 import { useWatchlistContext } from '../store/watchlistContext';
 import { useAuthContext } from '../store/authContext';
 import { toast } from 'react-toastify';
+import { DetailsSkeleton } from './SkeletonLoaders';
 
 const DetailsInfo = () => {
     const [mediaData, setMediaData] = useState({});
@@ -75,11 +75,7 @@ const DetailsInfo = () => {
     }
 
     if (loading) {
-        return (
-            <div className='w-full min-h-screen flex items-center justify-center'>
-                <Spinner borderColor={'border-white'} />
-            </div>
-        );
+        return <DetailsSkeleton />;
     }
 
     return (

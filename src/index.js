@@ -5,6 +5,7 @@ import App from './App';
 import { AuthContextProvider } from './store/authContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import 'react-loading-skeleton/dist/skeleton.css';
 import { WatchlistContextProvider } from './store/watchlistContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

@@ -4,7 +4,7 @@ import CardsList from '../components/CardsList'
 
 const Home = () => {
     return (
-        <section className=''>
+        <section className='min-h-screen'>
             <Banner />
 
             <div className='pb-5'>

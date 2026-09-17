@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import axiosInstance from '../services/axios';
 import PosterCard from '../components/PosterCard';
 import Spinner from '../components/Spinner';
+import { PosterCardSkeleton } from '../components/SkeletonLoaders';
 
 const SearchPage = () => {
     const [activeTab, setActiveTab] = useState('multi');
@@ -123,12 +124,10 @@ const SearchPage = () => {
                 />
             </form>
 
-            <div className='flex flex-col justify-center items-center'>
+            <div className='flex flex-col justify-center items-center w-full'>
                 {
                     loading ? (
-                        <div className='w-full h-[500px] flex items-center justify-center'>
-                            <Spinner borderColor={'border-white'} />
-                        </div>
+                        <PosterCardSkeleton count={12} />
                     ) : medias.length > 0 ? (
                         <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-2.5 md:gap-x-5 gap-y-3 md:gap-y-5 pt-5 pb-5 w-full px-1.5 md:px-4'>
                             {
