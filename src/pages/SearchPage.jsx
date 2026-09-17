@@ -1,13 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import axiosInstance from '../services/axios';
 import PosterCard from '../components/PosterCard';
 import Spinner from '../components/Spinner';
 import { PosterCardSkeleton } from '../components/SkeletonLoaders';
 import { MovieGenres, TvShowGenres } from '../constants/GenreList';
+import { getImageUrl } from '../constants/constants';
 
 const SearchPage = () => {
-    const [activeTab, setActiveTab] = useState('multi'); // multi, movie, tv
+    const [activeTab, setActiveTab] = useState('multi'); // multi, movie, tv, person
     const [search, setSearch] = useState('');
+    const [inputValue, setInputValue] = useState('');
     const [selectedGenre, setSelectedGenre] = useState('');
     const [sortBy, setSortBy] = useState('popularity.desc');
     const [medias, setMedias] = useState([]);
@@ -22,6 +25,13 @@ const SearchPage = () => {
     const genres = activeTab === 'tv' ? TvShowGenres : MovieGenres;
 
     const fetchData = useCallback(async () => {
+        if (!search.trim() && !selectedGenre) {
+            setMedias([]);
+            setLoading(false);
+            setLoadingMore(false);
+            return;
+        }
+
         if (page > 1) {
             setLoadingMore(true);
         } else {
@@ -31,18 +41,20 @@ const SearchPage = () => {
         try {
             let response;
 
-            // If user selected a genre or sort_by without search query, use discover API
-            if (selectedGenre || (search.trim().length === 0 && activeTab !== 'multi')) {
+            if (activeTab === 'person') {
+                response = await axiosInstance.get('/search/person', {
+                    params: { query: search, page: page },
+                });
+            } else if (selectedGenre && search.trim().length === 0) {
                 const mediaType = activeTab === 'multi' ? 'movie' : activeTab;
                 response = await axiosInstance.get(`/discover/${mediaType}`, {
                     params: {
-                        with_genres: selectedGenre || undefined,
+                        with_genres: selectedGenre,
                         sort_by: sortBy,
                         page: page,
                     },
                 });
             } else {
-                // Otherwise use search API
                 response = await axiosInstance.get(`/search/${activeTab}`, {
                     params: {
                         query: search,
@@ -57,8 +69,7 @@ const SearchPage = () => {
                 results = results.filter((result) => result.media_type !== 'person');
             }
 
-            // Client-side genre filtering if multi search return items
-            if (selectedGenre && search.trim().length > 0) {
+            if (selectedGenre && search.trim().length > 0 && activeTab !== 'person') {
                 const genreIdNum = Number(selectedGenre);
                 results = results.filter((item) => item.genre_ids?.includes(genreIdNum));
             }
@@ -80,7 +91,7 @@ const SearchPage = () => {
     }, [page, totalPages, loading, loadingMore]);
 
     useEffect(() => {
-        if (search.trim().length > 0 || selectedGenre || activeTab !== 'multi') {
+        if (search.trim().length > 0 || selectedGenre) {
             fetchData();
         } else {
             setMedias([]);
@@ -96,6 +107,7 @@ const SearchPage = () => {
 
     const handleSearch = (e) => {
         const value = e.target.value;
+        setInputValue(value);
         clearTimeout(searchTimer.current);
 
         searchTimer.current = setTimeout(() => {
@@ -103,6 +115,14 @@ const SearchPage = () => {
             setPage(1);
             setMedias([]);
         }, 300);
+    };
+
+    const handleClearSearch = () => {
+        setInputValue('');
+        setSearch('');
+        setSelectedGenre('');
+        setPage(1);
+        setMedias([]);
     };
 
     const handleTabClick = (tab) => {
@@ -128,19 +148,33 @@ const SearchPage = () => {
         <section className="container mx-auto min-h-[800px] md:min-h-screen flex flex-col items-center pt-24 pb-12 w-full px-4">
             {/* Search Input Bar */}
             <form onSubmit={(e) => e.preventDefault()} className="flex justify-center items-center px-2 sm:px-5 w-full">
-                <input
-                    type="text"
-                    placeholder={`Search for ${activeTab === 'multi' ? 'movies & TV shows...' : activeTab === 'tv' ? 'TV shows...' : 'movies...'}`}
-                    className="max-w-2xl w-full h-12 px-5 py-3 rounded-xl bg-[#14213d] text-white text-lg outline-none border border-gray-700 focus:border-red-500 transition-colors shadow-lg"
-                    onChange={handleSearch}
-                    defaultValue={search}
-                />
+                <div className="relative max-w-2xl w-full flex items-center">
+                    <input
+                        type="text"
+                        placeholder={`Search for ${activeTab === 'multi' ? 'movies & TV shows...' : activeTab === 'tv' ? 'TV shows...' : activeTab === 'person' ? 'actors & crew...' : 'movies...'}`}
+                        className="w-full h-12 pl-5 pr-12 py-3 rounded-xl bg-[#14213d] text-white text-lg outline-none border border-gray-700 focus:border-red-500 transition-colors shadow-lg"
+                        onChange={handleSearch}
+                        value={inputValue}
+                    />
+                    {(inputValue || selectedGenre) && (
+                        <button
+                            type="button"
+                            onClick={handleClearSearch}
+                            className="absolute right-4 text-gray-400 hover:text-white p-1 transition-colors"
+                            title="Clear search"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    )}
+                </div>
             </form>
 
             {/* Category Tabs & Filter Controls */}
             <div className="flex flex-wrap items-center justify-between gap-4 mt-6 w-full max-w-4xl bg-[#14213d]/60 p-4 rounded-xl border border-gray-800">
                 {/* Media Type Tabs */}
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <button
                         className={`py-1.5 px-4 rounded-lg font-semibold text-sm transition-colors ${activeTab === 'multi' ? 'bg-red-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700'}`}
                         onClick={() => handleTabClick('multi')}
@@ -159,35 +193,41 @@ const SearchPage = () => {
                     >
                         TV Shows
                     </button>
+                    <button
+                        className={`py-1.5 px-4 rounded-lg font-semibold text-sm transition-colors ${activeTab === 'person' ? 'bg-red-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700'}`}
+                        onClick={() => handleTabClick('person')}
+                    >
+                        People
+                    </button>
                 </div>
 
                 {/* Genre & Sort Dropdown Filters */}
-                <div className="flex flex-wrap items-center gap-3">
-                    {/* Genre Filter */}
-                    <select
-                        value={selectedGenre}
-                        onChange={handleGenreChange}
-                        className="bg-slate-800 text-white text-sm font-medium py-1.5 px-3 rounded-lg border border-gray-700 outline-none cursor-pointer focus:border-red-500"
-                    >
-                        <option value="">All Genres</option>
-                        {genres.map((genre) => (
-                            <option key={genre.id} value={genre.id}>
-                                {genre.name}
-                            </option>
-                        ))}
-                    </select>
+                {activeTab !== 'person' && (
+                    <div className="flex flex-wrap items-center gap-3">
+                        <select
+                            value={selectedGenre}
+                            onChange={handleGenreChange}
+                            className="bg-slate-800 text-white text-sm font-medium py-1.5 px-3 rounded-lg border border-gray-700 outline-none cursor-pointer focus:border-red-500"
+                        >
+                            <option value="">All Genres</option>
+                            {genres.map((genre) => (
+                                <option key={genre.id} value={genre.id}>
+                                    {genre.name}
+                                </option>
+                            ))}
+                        </select>
 
-                    {/* Sort By Filter */}
-                    <select
-                        value={sortBy}
-                        onChange={handleSortChange}
-                        className="bg-slate-800 text-white text-sm font-medium py-1.5 px-3 rounded-lg border border-gray-700 outline-none cursor-pointer focus:border-red-500"
-                    >
-                        <option value="popularity.desc">Most Popular</option>
-                        <option value="vote_average.desc">Highest Rated</option>
-                        <option value="primary_release_date.desc">Release Date (Newest)</option>
-                    </select>
-                </div>
+                        <select
+                            value={sortBy}
+                            onChange={handleSortChange}
+                            className="bg-slate-800 text-white text-sm font-medium py-1.5 px-3 rounded-lg border border-gray-700 outline-none cursor-pointer focus:border-red-500"
+                        >
+                            <option value="popularity.desc">Most Popular</option>
+                            <option value="vote_average.desc">Highest Rated</option>
+                            <option value="primary_release_date.desc">Release Date (Newest)</option>
+                        </select>
+                    </div>
+                )}
             </div>
 
             {/* Results Grid */}
@@ -195,23 +235,83 @@ const SearchPage = () => {
                 {loading && page === 1 ? (
                     <PosterCardSkeleton count={12} />
                 ) : medias.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 md:gap-x-5 gap-y-4 pt-4 pb-4 w-full px-1.5 md:px-4">
-                        {medias.map((data, index) => (
-                            <PosterCard
-                                key={`${data.id}-${index}`}
-                                data={data}
-                                type={activeTab === 'multi' ? data.media_type || 'movie' : activeTab}
-                                isSmall
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    (search.length > 0 || selectedGenre) && (
-                        <div className="flex flex-col items-center py-16 text-center">
-                            <h2 className="text-2xl text-white font-bold">No results found</h2>
-                            <p className="text-gray-400 mt-2 text-sm">Try adjusting your search query, genre, or filters.</p>
+                    activeTab === 'person' ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 pt-4 pb-4 w-full px-1.5 md:px-4">
+                            {medias.map((person, index) => (
+                                <Link
+                                    to={`/person/${person.id}`}
+                                    key={`${person.id}-${index}`}
+                                    className="flex flex-col items-center group cursor-pointer bg-[#14213d]/60 p-4 rounded-2xl border border-gray-800 hover:border-red-500/50 transition-all duration-300 hover:scale-105"
+                                >
+                                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-[#14213d] border-2 border-gray-700/60 group-hover:border-red-500 shadow-xl relative">
+                                        {person.profile_path ? (
+                                            <img
+                                                src={getImageUrl('w500', person.profile_path)}
+                                                alt={person.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-xs text-gray-400 text-center px-1">
+                                                No Photo
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="mt-3 text-center w-full">
+                                        <h3 className="text-sm font-bold text-white truncate group-hover:text-red-400 transition-colors">
+                                            {person.name}
+                                        </h3>
+                                        <p className="text-xs text-gray-400 truncate mt-0.5">
+                                            {person.known_for_department || 'Actor/Crew'}
+                                        </p>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 md:gap-x-5 gap-y-4 pt-4 pb-4 w-full px-1.5 md:px-4">
+                            {medias.map((data, index) => (
+                                <PosterCard
+                                    key={`${data.id}-${index}`}
+                                    data={data}
+                                    type={activeTab === 'multi' ? data.media_type || 'movie' : activeTab}
+                                    isSmall
+                                />
+                            ))}
                         </div>
                     )
+                ) : (search.length > 0 || selectedGenre) ? (
+                    <div className="flex flex-col items-center py-16 text-center">
+                        <div className="w-14 h-14 rounded-full bg-[#14213d] border border-gray-800 flex items-center justify-center mb-4 text-gray-400">
+                            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-2xl text-white font-bold">No results found</h2>
+                        <p className="text-gray-400 mt-2 text-sm max-w-sm">
+                            We couldn't find anything matching your search. Try checking your spelling or clear filters.
+                        </p>
+                        <button
+                            onClick={handleClearSearch}
+                            className="mt-5 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-sm rounded-xl transition-all shadow-lg hover:shadow-red-600/30 flex items-center gap-2 cursor-pointer"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Clear Search & Filters
+                        </button>
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-20 text-center px-4 max-w-md">
+                        <div className="w-16 h-16 rounded-full bg-[#14213d] border border-gray-800 flex items-center justify-center mb-4 text-red-500 shadow-xl">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-xl font-bold text-white mb-2">Search Movies, TV Shows & People</h2>
+                        <p className="text-sm text-gray-400 leading-relaxed">
+                            Type a title, cast member, or choose a genre above to discover entertainment options.
+                        </p>
+                    </div>
                 )}
 
                 {loadingMore && (

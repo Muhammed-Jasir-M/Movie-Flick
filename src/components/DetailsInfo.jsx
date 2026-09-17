@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import axiosInstance from '../services/axios';
 import { Link, useParams } from 'react-router-dom';
 import { getImageUrl } from '../constants/constants';
-import { FaBookmark, FaPlay, FaRegBookmark, FaRegCalendarAlt, FaRegClock, FaStar } from 'react-icons/fa';
+import { FaBookmark, FaExternalLinkAlt, FaPlay, FaRegBookmark, FaRegCalendarAlt, FaRegClock, FaStar } from 'react-icons/fa';
 import moment from 'moment';
 import { BiCameraMovie } from 'react-icons/bi';
 import { useWatchlistContext } from '../store/watchlistContext';
@@ -128,20 +128,36 @@ const DetailsInfo = () => {
                                 </button>
                             </Link>
 
-                            <button
-                                onClick={handleClick}
-                                disabled={watchlistLoading}
-                                className={`w-full py-2.5 px-5 font-semibold rounded-xl border flex items-center justify-center gap-2.5 transition-all duration-300 ${
-                                    watchlistLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
-                                } ${
-                                    isInWatchlist
-                                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30'
-                                        : 'bg-slate-800/80 hover:bg-slate-700 text-gray-200 border-gray-700'
-                                }`}
-                            >
-                                {isInWatchlist ? <FaBookmark className="text-amber-400" /> : <FaRegBookmark />}
-                                <span>{isInWatchlist ? 'In Watchlist' : 'Add to Watchlist'}</span>
-                            </button>
+                            <div className="flex gap-2 w-full">
+                                <button
+                                    onClick={handleClick}
+                                    disabled={watchlistLoading}
+                                    className={`flex-1 py-2.5 px-3 font-semibold text-xs sm:text-sm rounded-xl border flex items-center justify-center gap-1.5 transition-all duration-300 ${
+                                        watchlistLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
+                                    } ${
+                                        isInWatchlist
+                                            ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30'
+                                            : 'bg-slate-800/80 hover:bg-slate-700 text-gray-200 border-gray-700'
+                                    }`}
+                                >
+                                    {isInWatchlist ? <FaBookmark className="text-amber-400 text-xs flex-shrink-0" /> : <FaRegBookmark className="text-xs flex-shrink-0" />}
+                                    <span className="truncate">{isInWatchlist ? 'In Watchlist' : 'Watchlist'}</span>
+                                </button>
+
+                                {mediaData?.homepage && (
+                                    <a
+                                        href={mediaData.homepage}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex-1"
+                                    >
+                                        <button className="w-full py-2.5 px-3 font-semibold text-xs sm:text-sm rounded-xl border border-gray-700 bg-slate-800/80 hover:bg-slate-700 text-gray-200 flex items-center justify-center gap-1.5 transition-all duration-300 cursor-pointer">
+                                            <FaExternalLinkAlt className="text-xs flex-shrink-0" />
+                                            <span className="truncate">Website</span>
+                                        </button>
+                                    </a>
+                                )}
+                            </div>
                         </div>
                     </div>
 
