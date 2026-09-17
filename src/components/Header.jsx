@@ -49,8 +49,8 @@ const Header = () => {
             `}
         >
             <div className='w-full flex gap-5 justify-between items-center'>
-                <Link to='/'>
-                    <h1 className='text-3xl font-bold whitespace-nowrap'>
+                <Link to='/landing'>
+                    <h1 className='text-3xl font-bold whitespace-nowrap cursor-pointer hover:text-red-500 transition-colors'>
                         Movie Flick
                     </h1>
                 </Link>

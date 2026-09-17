@@ -16,6 +16,7 @@ import LoginPage from './pages/LoginPage'
 import ResetPassword from './components/ResetPassword'
 import NotFound from './pages/NotFound'
 import AboutPage from './pages/AboutPage'
+import LandingPage from './pages/LandingPage'
 import Profile from './pages/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
 import WatchList from './pages/WatchList'
@@ -30,6 +31,7 @@ const App = () => {
                 <div className='flex-1'>
                     <Routes>
                         <Route path='/' element={<Home />} />
+                        <Route path='/landing' element={<LandingPage />} />
                         <Route path='/movies' element={<Movies />} />
                         <Route path='/tv' element={<Tv />} />
                         <Route path='/search' element={<SearchPage />} />
