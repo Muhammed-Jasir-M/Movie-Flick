@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { IoClose } from 'react-icons/io5';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -38,18 +39,20 @@ const ChangePasswordModal = ({ showModal, onClose, user }) => {
             .required('New password is required')
             .min(6, 'Password must be at least 6 characters long')
             .matches(
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
-                'Must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number'
+                /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$/,
+                'Password must contain at least one letter and one number'
             ),
     });
 
-    const onSubmit = async (values) => {
+    const onSubmit = async (values, { setSubmitting }) => {
         try {
             await updateUserPassword(values.currentPassword, values.newPassword);
             toast.success('Password updated successfully!');
             onClose();
         } catch (error) {
-            toast.error(`Password update failed: ${error.message}`);
+            toast.error(`Error updating password: ${error.message}`);
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -61,8 +64,8 @@ const ChangePasswordModal = ({ showModal, onClose, user }) => {
 
     if (!showModal) return null;
 
-    return (
-        <div className="fixed inset-0 z-50 flex justify-center items-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+    return ReactDOM.createPortal(
+        <div className="fixed inset-0 z-[9999] flex justify-center items-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-[#14213d] border border-gray-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full relative flex flex-col items-center">
                 {/* Close Button */}
                 <button
@@ -170,7 +173,8 @@ const ChangePasswordModal = ({ showModal, onClose, user }) => {
                     </div>
                 </form>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { FaTrashAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import { useAuthContext } from '../store/authContext';
@@ -45,8 +46,8 @@ const DeleteModal = ({ showModal, onClose, user }) => {
         }
     };
 
-    return (
-        <div className="fixed inset-0 z-50 flex justify-center items-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+    return ReactDOM.createPortal(
+        <div className="fixed inset-0 z-[9999] flex justify-center items-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-[#14213d] border border-gray-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full relative text-center flex flex-col items-center">
                 {/* Close Button */}
                 <button
@@ -112,7 +113,8 @@ const DeleteModal = ({ showModal, onClose, user }) => {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

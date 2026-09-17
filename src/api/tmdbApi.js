@@ -43,7 +43,10 @@ export const tmdbApi = {
 
     getMediaVideos: async (type, id) => {
         const response = await axiosInstance.get(ENDPOINTS.MEDIA_VIDEOS(type, id), {
-            params: { include_video_language: VIDEO_LANGUAGES },
+            params: {
+                language: 'en-US',
+                include_video_language: VIDEO_LANGUAGES
+            },
         });
         return response.data?.results || [];
     },

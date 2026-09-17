@@ -11,6 +11,7 @@ const Home = () => {
                 <CardsList endpoint={`/trending/all/week`} title={'Trending'} isTrending />
                 <CardsList endpoint={`/movie/popular`} title={'Popular Movies'} type={'movie'} />
                 <CardsList endpoint={`/tv/popular`} title={'Popular Tv Shows'} type={'tv'} />
+                <CardsList endpoint="/discover/tv?with_genres=16&sort_by=popularity.desc" title="Popular Anime" type="tv" />
                 <CardsList endpoint={`/movie/top_rated`} title={'Top Rated Movies'} type={'movie'} />
                 <CardsList endpoint={`/tv/top_rated`} title={'Top Rated Tv Shows'} type={'tv'} />
                 <CardsList endpoint={`/movie/now_playing`} title={'Now Playing Movies'} type={'movie'} />

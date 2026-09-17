@@ -7,7 +7,7 @@ export const MEDIA_TYPES = {
     MULTI: 'multi',
 };
 
-export const VIDEO_LANGUAGES = 'en,hi,ta,te,ml,null';
+export const VIDEO_LANGUAGES = 'en,en-US,ja,hi,ta,te,ml,kn,ko,es,fr,de,it,pt,ru,zh,ar,tr,null';
 
 export const SORT_OPTIONS = [
     { value: 'popularity.desc', label: 'Most Popular' },

@@ -4,6 +4,7 @@ import { getImageUrl } from '../constants/constants';
 import { Link } from 'react-router-dom';
 import { FaPlay, FaRegCalendarAlt, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { MdInfoOutline } from 'react-icons/md';
+import { MovieGenres, TvShowGenres } from '../constants/GenreList';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
@@ -13,6 +14,28 @@ import { Keyboard, Autoplay, Pagination, Navigation } from 'swiper/modules';
 
 import { BannerSkeleton } from './SkeletonLoaders';
 import moment from 'moment';
+
+// Create a combined genre lookup map
+const genreMap = {};
+[...MovieGenres, ...TvShowGenres].forEach((g) => {
+    genreMap[g.id] = g.name;
+});
+
+const getGenreNames = (genreIds) => {
+    if (!genreIds || !Array.isArray(genreIds)) return [];
+    return genreIds
+        .map((id) => genreMap[id])
+        .filter(Boolean)
+        .slice(0, 3); // top 3 genres
+};
+
+const getMediaTypeLabel = (item, mediaTypeProp, path) => {
+    if (path.includes('/anime') || (item?.genre_ids?.includes(16) && item?.original_language === 'ja')) {
+        return 'ANIME';
+    }
+    const type = item?.media_type || mediaTypeProp || (item?.first_air_date ? 'tv' : 'movie');
+    return type === 'tv' ? 'TV' : 'MOVIE';
+};
 
 const Banner = ({ mediaType }) => {
     const [trendingData, setTrendingData] = useState([]);
@@ -114,10 +137,25 @@ const Banner = ({ mediaType }) => {
                             />
 
                             <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent"></div>
+                            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent"></div>
 
-                            <div className="absolute bottom-20 flex flex-col gap-5 max-w-full md:max-w-xl mx-5 md:mx-16 text-center md:text-left z-10">
-                                <h1 className="text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg">
+                            <div className="absolute bottom-16 sm:bottom-20 flex flex-col gap-4 max-w-full md:max-w-xl mx-5 md:mx-16 text-center md:text-left z-10">
+                                {/* Media Type & Genre Badges */}
+                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                                    <span className="px-3 py-1 text-xs font-extrabold uppercase rounded-md bg-red-600 text-white shadow-md tracking-wider">
+                                        {getMediaTypeLabel(data, mediaType, path)}
+                                    </span>
+                                    {getGenreNames(data?.genre_ids).map((genreName, idx) => (
+                                        <span
+                                            key={idx}
+                                            className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-900/80 text-gray-200 border border-slate-700/60 backdrop-blur-md shadow-sm"
+                                        >
+                                            {genreName}
+                                        </span>
+                                    ))}
+                                </div>
+
+                                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg leading-tight">
                                     {data?.title || data?.name}
                                 </h1>
 
@@ -125,7 +163,7 @@ const Banner = ({ mediaType }) => {
                                     {data?.overview}
                                 </p>
 
-                                <div className="flex gap-4 text-sm font-semibold justify-center md:justify-start text-white">
+                                <div className="flex gap-4 text-sm font-semibold justify-center md:justify-start text-white items-center">
                                     <p className="flex items-center gap-1.5 drop-shadow-md">
                                         <FaStar className="text-yellow-400" />
                                         {data.vote_average > 0 ? Number(data?.vote_average).toFixed(1) : 'N/A'}
