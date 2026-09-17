@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import { FaTrashAlt } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaTrashAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
-import { useAuthContext } from '../store/authContext'
+import { useAuthContext } from '../store/authContext';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const DeleteModal = ({ showModal, onClose, user }) => {
     const [password, setPassword] = useState('');
@@ -26,103 +25,95 @@ const DeleteModal = ({ showModal, onClose, user }) => {
         };
     }, [showModal]);
 
+    if (!showModal) return null;
+
     const handleDeleteClick = async () => {
-        if (!password.trim() && user.providerData[0].providerId === 'password') {
-            return toast.error('Please enter your password');
+        if (!password.trim() && user?.providerData?.[0]?.providerId === 'password') {
+            return toast.error('Please enter your password to confirm deletion');
         }
 
         setLoading(true);
         try {
             await deleteUserProfile(password);
-            toast.success('User deleted successfully!');
+            toast.success('Account deleted successfully!');
             navigate('/login');
             onClose();
         } catch (error) {
-            toast.error(`Error deleting: ${error.message}`);
+            toast.error(`Error deleting account: ${error.message}`);
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return (
-        <div className={`fixed z-50 inset-0 flex justify-center items-center transition-colors 
-            ${showModal ? 'visible bg-[#0A1128]/70' : 'invisible'} 
-        `}>
-            <div className={`bg-slate-900 rounded-xl shadow p-6 transition-all max-w-sm w-full  
-                ${showModal ? 'scale-100 opacity-100' : 'scale-125 opacity-0'} 
-            `}
-            >
+        <div className="fixed inset-0 z-50 flex justify-center items-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-[#14213d] border border-gray-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full relative text-center flex flex-col items-center">
+                {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className={`absolute top-2 right-2 p-1 rounded-lg text-slate-200 bg-slate-900 hover:bg-slate-100 hover:text-gray-950`}
+                    className="absolute top-4 right-4 p-1 rounded-lg text-gray-400 hover:text-white hover:bg-slate-800 transition-colors"
                 >
-                    <IoClose />
+                    <IoClose size={20} />
                 </button>
 
-                <div className='flex gap-2.5 flex-col text-center'>
-                    <FaTrashAlt
-                        size={56}
-                        className='text-red-500 mx-auto'
-                    />
+                {/* Warning Icon Badge */}
+                <div className="w-16 h-16 rounded-full bg-red-600/10 border border-red-500/30 flex items-center justify-center text-red-500 mb-4 shadow-lg">
+                    <FaTrashAlt size={26} />
+                </div>
 
-                    <div className='flex flex-col gap-2'>
-                        <h3 className='text-lg text-slate-50'>Delete Confirmation</h3>
-                        <p className='text-sm text-slate-200'>
-                            Are you sure you want to delete this Account?
-                        </p>
+                {/* Heading & Text */}
+                <h3 className="text-xl font-extrabold text-white mb-2">Delete Account</h3>
+                <p className="text-sm text-gray-300 mb-4 leading-relaxed">
+                    Are you sure you want to permanently delete your account? This action cannot be undone.
+                </p>
 
-                        {
-                            user.providerData[0].providerId === 'password' && (
-                                <div className='relative'>
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        value={password}
-                                        placeholder='Password'
-                                        className='rounded bg-[#14213d] text-white w-full px-3 py-1.5 pr-8 outline-none'
-                                    />
-
-                                    <span
-                                        className='absolute top-2 right-2 text-lg cursor-pointer font-semibold'
-                                        onClick={() => setShowPassword(!showPassword)}
-                                    >
-                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </span>
-                                </div>
-                            )
-                        }
+                {/* Password confirmation for email/password provider */}
+                {user?.providerData?.[0]?.providerId === 'password' && (
+                    <div className="w-full mb-5 text-left">
+                        <label className="text-xs font-semibold text-gray-300 block mb-1">
+                            Confirm Password
+                        </label>
+                        <div className="relative">
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                onChange={(e) => setPassword(e.target.value)}
+                                value={password}
+                                placeholder="Enter current password"
+                                className="w-full h-10 rounded-xl bg-slate-900 border border-gray-700 text-white text-sm px-3 pr-10 outline-none focus:border-red-500 transition-colors"
+                            />
+                            <button
+                                type="button"
+                                className="absolute right-3 top-2.5 text-gray-400 hover:text-white transition-colors"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                            </button>
+                        </div>
                     </div>
+                )}
 
-                    <div className='flex justify-between mt-1'>
-                        <button
-                            className='bg-red-500 px-2 py-1 rounded cursor-pointer'
-                            onClick={handleDeleteClick}
-                            disabled={loading}
-                        >
-                            {
-                                loading ? (
-                                    <span className='text-lg'>
-                                        Deleting...
-                                    </span>
-                                ) : (
-                                    <span className='text-lg'>
-                                        Yes, Delete it
-                                    </span>
-                                )
-                            }
-                        </button>
-
-                        <button
-                            className='bg-slate-500 px-2 py-1 rounded cursor-pointer'
-                            onClick={onClose}
-                        >
-                            No, Cancel
-                        </button>
-                    </div>
+                {/* Action Buttons */}
+                <div className="flex items-center justify-center gap-3 w-full">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="flex-1 py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-gray-300 font-semibold text-sm rounded-xl transition-colors cursor-pointer"
+                        disabled={loading}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleDeleteClick}
+                        className="flex-1 py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-red-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
+                        disabled={loading}
+                    >
+                        {loading ? 'Deleting...' : 'Delete Account'}
+                    </button>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default DeleteModal
+export default DeleteModal;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { IoIosNotifications } from 'react-icons/io'
 import { IoMenu, IoSearch } from 'react-icons/io5'
 import { Link, NavLink } from 'react-router-dom'
 import { useAuthContext } from '../store/authContext'
@@ -75,8 +74,6 @@ const Header = () => {
                     <Link to='/search'>
                         <IoSearch className='cursor-pointer hidden sm:block lg:block text-3xl' />
                     </Link>
-
-                    <IoIosNotifications className='cursor-pointer text-3xl' />
 
                     {
                         user ? (
