@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { IoMenu, IoSearch } from 'react-icons/io5'
-import { BsBookmarkFill } from 'react-icons/bs'
-import { Link, NavLink } from 'react-router-dom'
-import { useAuthContext } from '../store/authContext'
-import Dropdown from './Dropdown'
+import React, { useState, useEffect, useCallback } from 'react';
+import { IoMenu, IoSearch } from 'react-icons/io5';
+import { BsBookmarkFill } from 'react-icons/bs';
+import { Link, NavLink } from 'react-router-dom';
+import { useAuthContext } from '../store/authContext';
+import Dropdown from './Dropdown';
+import Logo from './Logo';
 
 const Header = () => {
     const [navbarToggle, setNavbarToggle] = useState(false);
@@ -13,7 +14,7 @@ const Header = () => {
     const navLinks = [
         {
             label: 'Home',
-            href: '/home',
+            href: '/',
         },
         {
             label: 'Movies',
@@ -30,7 +31,7 @@ const Header = () => {
     ];
 
     const handleScroll = useCallback(() => {
-        if (window.scrollY > 0) {
+        if (window.scrollY > 10) {
             setScrolled(true);
         } else {
             setScrolled(false);
@@ -39,27 +40,23 @@ const Header = () => {
 
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-
+        return () => window.removeEventListener('scroll', handleScroll);
     }, [handleScroll]);
 
     return (
         <header className={`
-                fixed top-0 max-w-[1536px] w-full z-50 py-4 px-5 text-[#FFFFFF] shadow-md rounded-b-md
-                ${scrolled ? 'bg-[#14213d]' : 'bg-transparent'}
+                fixed top-0 max-w-[1536px] w-full z-50 py-3 sm:py-3.5 px-4 sm:px-6 text-white transition-colors duration-300 border-b
+                ${scrolled ? 'bg-[#0f172a]/95 backdrop-blur-md shadow-2xl border-gray-800/80' : 'bg-gradient-to-b from-[#0f172a]/95 via-[#0f172a]/60 to-transparent border-transparent'}
             `}
         >
-            <div className='w-full flex gap-5 justify-between items-center'>
-                <Link to='/'>
-                    <h1 className='text-3xl font-bold whitespace-nowrap cursor-pointer hover:text-red-500 transition-colors'>
-                        Movie Flick
-                    </h1>
+            <div className='w-full flex gap-4 justify-between items-center max-w-7xl mx-auto'>
+                {/* Logo links to Landing Page */}
+                <Link to='/landing' title="Movie Flick Landing">
+                    <Logo />
                 </Link>
 
-                <nav className={`hidden absolute sm:flex flex-col top-16 left-0 w-full py-3 px-5 md:px-0 md:py-0 md:w-auto bg-[#14213d] md:bg-transparent md:static md:flex md:flex-row items-center gap-1 md:gap-5 ${navbarToggle ? 'sm:block' : 'sm:hidden'}`}>
+                {/* Desktop Navigation */}
+                <nav className={`hidden absolute sm:flex flex-col top-16 left-0 w-full py-4 px-6 md:px-0 md:py-0 md:w-auto bg-[#14213d] md:bg-transparent md:static md:flex md:flex-row items-center gap-1.5 md:gap-2 ${navbarToggle ? 'sm:flex' : 'sm:hidden'}`}>
                     {
                         navLinks.map((navLink) => (
                             <NavLink
@@ -67,8 +64,13 @@ const Header = () => {
                                 key={navLink.label}
                                 end
                                 onClick={() => setNavbarToggle(false)}
-                                className={({ isActive }) => `${isActive && 'bg-[#0A1128]'}
-                                    text-xl font-medium w-full text-center py-1.5 px-0 md:px-2 hover:bg-[#0A1128] whitespace-nowrap rounded`}
+                                className={({ isActive }) => `
+                                    text-sm md:text-base font-semibold px-3.5 py-1.5 rounded-xl transition-all duration-200 whitespace-nowrap
+                                    ${isActive
+                                        ? 'bg-red-600 text-white shadow-lg shadow-red-600/30 font-bold'
+                                        : 'text-gray-300 hover:text-white hover:bg-slate-800/70'
+                                    }
+                                `}
                             >
                                 {navLink.label}
                             </NavLink>
@@ -76,13 +78,14 @@ const Header = () => {
                     }
                 </nav>
 
-                <div className='flex items-center gap-3'>
-                    <Link to='/search' title="Search">
-                        <IoSearch className='cursor-pointer text-2xl hover:text-red-500 transition-colors' />
+                {/* Action Icons & Profile */}
+                <div className='flex items-center gap-2.5 sm:gap-3.5'>
+                    <Link to='/search' title="Search" className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700 text-gray-200 hover:text-white border border-gray-700/60 transition-all hover:scale-105 active:scale-95">
+                        <IoSearch className='text-lg sm:text-xl' />
                     </Link>
 
-                    <Link to='/watchlist' title="Watchlist">
-                        <BsBookmarkFill className='cursor-pointer text-xl hover:text-amber-400 transition-colors' />
+                    <Link to='/watchlist' title="Watchlist" className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700 text-amber-400 border border-gray-700/60 transition-all hover:scale-105 active:scale-95">
+                        <BsBookmarkFill className='text-base sm:text-lg' />
                     </Link>
 
                     {
@@ -90,7 +93,7 @@ const Header = () => {
                             <Dropdown user={user} />
                         ) : (
                             <Link to={'/login'}>
-                                <button className='bg-red-500 px-2 py-1 rounded-md cursor-pointer font-semibold'>
+                                <button className='bg-red-600 hover:bg-red-700 px-3.5 py-1.5 rounded-xl cursor-pointer font-bold text-xs sm:text-sm text-white shadow-md hover:shadow-red-600/30 transition-all hover:scale-105 active:scale-95'>
                                     Login
                                 </button>
                             </Link>
@@ -98,12 +101,12 @@ const Header = () => {
                     }
 
                     <div className='hidden sm:block md:hidden'>
-                        <IoMenu onClick={() => setNavbarToggle(!navbarToggle)} className='cursor-pointer text-3xl' />
+                        <IoMenu onClick={() => setNavbarToggle(!navbarToggle)} className='cursor-pointer text-2xl text-gray-300 hover:text-white' />
                     </div>
                 </div>
-            </div >
-        </header >
-    )
-}
+            </div>
+        </header>
+    );
+};
 
-export default Header
+export default Header;

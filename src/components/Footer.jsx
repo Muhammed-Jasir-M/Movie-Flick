@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Logo from './Logo';
 
 const Footer = () => {
     const footerLinks = [
@@ -28,9 +29,7 @@ const Footer = () => {
             <div className='flex flex-col md:flex-row justify-between gap-6'>
                 <div className='flex flex-col gap-3 w-full items-center md:items-start'>
                     <Link to='/landing'>
-                        <h1 className='text-2xl md:text-3xl font-bold whitespace-nowrap text-white hover:text-red-500 transition-colors'>
-                            Movie Flick
-                        </h1>
+                        <Logo size="lg" />
                     </Link>
 
                     <p className='text-sm max-w-[400px] px-4 md:px-0 w-full text-center md:text-left text-gray-400 leading-relaxed'>

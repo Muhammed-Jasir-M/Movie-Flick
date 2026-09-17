@@ -22,11 +22,7 @@ import Profile from './pages/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
 import WatchList from './pages/WatchList'
 import PersonDetails from './pages/PersonDetails'
-import { useAuthContext } from './store/authContext'
-
 const App = () => {
-    const { user } = useAuthContext();
-
     return (
         <main className='2xl:container mx-auto min-h-screen flex flex-col justify-between'>
             <BrowserRouter>
@@ -34,7 +30,7 @@ const App = () => {
                 <ScrollToTop />
                 <div className='flex-1'>
                     <Routes>
-                        <Route path='/' element={user ? <Home /> : <LandingPage />} />
+                        <Route path='/' element={<Home />} />
                         <Route path='/home' element={<Home />} />
                         <Route path='/landing' element={<LandingPage />} />
                         <Route path='/movies' element={<Movies />} />
