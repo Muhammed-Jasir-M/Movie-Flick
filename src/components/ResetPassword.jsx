@@ -1,9 +1,11 @@
-import React from 'react'
+import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAuthContext } from '../store/authContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import Spinner from './Spinner';
+import { FaKey, FaArrowLeft } from 'react-icons/fa';
 
 const initialValues = {
     email: '',
@@ -11,8 +13,8 @@ const initialValues = {
 
 const schema = Yup.object().shape({
     email: Yup.string()
-        .email('Invalid email')
-        .required('Required'),
+        .email('Invalid email address')
+        .required('Email is required'),
 });
 
 const ResetPassword = () => {
@@ -22,8 +24,7 @@ const ResetPassword = () => {
     const onSubmit = async (values) => {
         try {
             await resetPassword(values.email);
-            toast.success("Password reset email sent successfully!");
-            toast.success("Please check your email");
+            toast.success("Password reset link sent to your email!");
             navigate('/login');
         } catch (error) {
             toast.error(`Reset failed: ${error.message}`);
@@ -37,57 +38,74 @@ const ResetPassword = () => {
     });
 
     return (
-        <div className='min-h-screeen pt-20 flex justify-center'>
+        <section className="min-h-screen pt-24 pb-12 flex justify-center items-center px-4 bg-gradient-to-b from-[#0a1128] via-[#0f172a] to-[#0a1128]">
             <form
-                className='flex flex-col items-center w-full gap-5 max-w-lg bg-slate-900 px-3 md:px-5 py-10 my-10 rounded-md'
+                className="flex flex-col w-full max-w-md bg-[#14213d]/80 backdrop-blur-md p-8 md:p-10 rounded-2xl border border-gray-800 shadow-2xl relative"
                 onSubmit={handleSubmit}
             >
-                <h1 className='text-3xl font-bold'>
-                    Reset Password
-                </h1>
+                {/* Header Icon */}
+                <div className="flex flex-col items-center text-center mb-8">
+                    <div className="w-14 h-14 rounded-full bg-red-600/10 border border-red-500/30 flex items-center justify-center text-red-500 mb-4 shadow-xl">
+                        <FaKey size={22} />
+                    </div>
+                    <h1 className="text-3xl font-extrabold text-white tracking-tight">Reset Password</h1>
+                    <p className="text-sm text-gray-400 mt-2 leading-relaxed">
+                        Enter your email address and we'll send you a link to reset your password.
+                    </p>
+                </div>
 
-                <div className='w-full'>
-                    <label htmlFor='email' className='text-white font-semibold block mb-1'>
-                        Email
+                {/* Email Field */}
+                <div className="mb-6">
+                    <label htmlFor="email" className="text-sm font-semibold text-gray-300 block mb-2">
+                        Email Address
                     </label>
-
                     <input
-                        type='text'
-                        placeholder='Email'
-                        id='email'
-                        className={`w-full h-12 rounded bg-[#14213d] text-white border-0 outline-none font-semibold text-base px-3 md:px-5 py-4 ${errors.email && touched.email && 'outline outline-orange-700'}`}
+                        type="email"
+                        placeholder="you@example.com"
+                        id="email"
+                        className={`w-full h-12 rounded-xl bg-[#0f172a] text-white border outline-none font-medium px-4 text-sm transition-all ${
+                            errors.email && touched.email
+                                ? 'border-red-500 focus:ring-2 focus:ring-red-500/50'
+                                : 'border-gray-700 focus:border-red-500 focus:ring-2 focus:ring-red-500/30'
+                        }`}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         value={values.email}
                     />
-
                     {errors.email && touched.email && (
-                        <p className='text-orange-700 font-medium mt-1.5 text-sm'>{errors.email}</p>
+                        <p className="text-red-400 font-medium mt-1.5 text-xs">{errors.email}</p>
                     )}
                 </div>
 
-                <div className='w-full flex flex-col gap-2'>
-                    <button
-                        type='submit'
-                        className='w-full bg-[#e50914] hover:bg-[#e50914cb] text-white p-3 text-base font-semibold rounded cursor-pointer'
-                        disabled={isSubmitting || !isValid}
-                    >
-                        <span className='text-lg'>
-                            Reset Password
-                        </span>
-                    </button>
-                </div>
+                {/* Submit Button */}
+                <button
+                    type="submit"
+                    className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white py-3 rounded-xl font-bold text-base shadow-lg shadow-red-600/30 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer mb-6"
+                    disabled={isSubmitting || !isValid}
+                >
+                    {isSubmitting ? (
+                        <div className="flex items-center justify-center gap-3">
+                            <Spinner borderColor="border-white" />
+                            <span>Sending Reset Link...</span>
+                        </div>
+                    ) : (
+                        'Send Reset Link'
+                    )}
+                </button>
 
-                <div className='w-full flex items-center gap-1.5 text-[#b3b3b3] font-medium justify-center'>
-                    <Link to='/login'>
-                        <span className='text-[#fff] font-semibold hover:underline hover:underline-offset-2 cursor-pointer text-xl'>
-                            Login
-                        </span>
+                {/* Back to Login Redirect */}
+                <div className="text-center pt-4 border-t border-gray-800">
+                    <Link
+                        to="/login"
+                        className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors font-medium"
+                    >
+                        <FaArrowLeft size={12} />
+                        <span>Back to Sign In</span>
                     </Link>
                 </div>
             </form>
-        </div>
-    )
-}
+        </section>
+    );
+};
 
-export default ResetPassword
+export default ResetPassword;
