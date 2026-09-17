@@ -52,27 +52,34 @@ const DetailsInfo = () => {
         }
     }, [user, mediaData.id, fetchWatchlist]);
 
+    const [watchlistLoading, setWatchlistLoading] = useState(false);
+
     const handleClick = async () => {
-        setLoading(true);
+        if (!user) {
+            toast.error('You need to login');
+            return;
+        }
+
+        setWatchlistLoading(true);
+        const nextState = !isInWatchlist;
+        setIsInWatchlist(nextState);
+
         try {
-            if (!user) {
-                toast.error('you need to login');
+            if (nextState) {
+                await addToWatchlist(user.uid, mediaData, type);
+                toast.success('Added to watchlist');
             } else {
-                setIsInWatchlist(!isInWatchlist);
-                if (!isInWatchlist) {
-                    await addToWatchlist(user.uid, mediaData, type);
-                    toast.success('Added to watchlist');
-                } else {
-                    await removeFromWatchlist(user.uid, mediaData, type);
-                    toast.success('Removed from watchlist');
-                }
+                await removeFromWatchlist(user.uid, mediaData, type);
+                toast.success('Removed from watchlist');
             }
         } catch (error) {
-            console.log('Error removing from watchlist:', error);
+            console.error('Error updating watchlist:', error);
+            setIsInWatchlist(!nextState); // revert on error
+            toast.error('Failed to update watchlist');
         } finally {
-            setLoading(false)
+            setWatchlistLoading(false);
         }
-    }
+    };
 
     if (loading) {
         return <DetailsSkeleton />;
@@ -123,7 +130,10 @@ const DetailsInfo = () => {
 
                             <button
                                 onClick={handleClick}
-                                className={`w-full py-2.5 px-5 font-semibold rounded-xl border flex items-center justify-center gap-2.5 transition-all duration-300 cursor-pointer ${
+                                disabled={watchlistLoading}
+                                className={`w-full py-2.5 px-5 font-semibold rounded-xl border flex items-center justify-center gap-2.5 transition-all duration-300 ${
+                                    watchlistLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
+                                } ${
                                     isInWatchlist
                                         ? 'bg-red-600/20 text-red-400 border-red-500/40 hover:bg-red-600/30'
                                         : 'bg-slate-800/80 hover:bg-slate-700 text-gray-200 border-gray-700'
