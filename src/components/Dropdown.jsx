@@ -22,7 +22,7 @@ const Dropdown = ({ user }) => {
             await signout();
             toast.success('Signed out successfully');
             setShowLogoutModal(false);
-            navigate('/login');
+            navigate('/landing');
         } catch (error) {
             toast.error('Signout failed');
         } finally {

@@ -42,34 +42,29 @@ const DetailsInfo = () => {
 
     useEffect(() => {
         const checkWatchlistStatus = async () => {
-            const watchlist = await fetchWatchlist(user.uid);
-            const isInWatchlist = watchlist.some(item => item.id === mediaData.id);
-            setIsInWatchlist(isInWatchlist);
+            if (mediaData?.id) {
+                const watchlist = await fetchWatchlist(user?.uid);
+                const isSaved = watchlist.some(item => Number(item.id) === Number(mediaData.id) || item.id === `${type}-${mediaData.id}`);
+                setIsInWatchlist(isSaved);
+            }
         };
 
-        if (user && mediaData.id) {
-            checkWatchlistStatus();
-        }
-    }, [user, mediaData.id, fetchWatchlist]);
+        checkWatchlistStatus();
+    }, [user?.uid, mediaData?.id, type, fetchWatchlist]);
 
     const [watchlistLoading, setWatchlistLoading] = useState(false);
 
     const handleClick = async () => {
-        if (!user) {
-            toast.error('You need to login');
-            return;
-        }
-
         setWatchlistLoading(true);
         const nextState = !isInWatchlist;
         setIsInWatchlist(nextState);
 
         try {
             if (nextState) {
-                await addToWatchlist(user.uid, mediaData, type);
+                await addToWatchlist(user?.uid, mediaData, type);
                 toast.success('Added to watchlist');
             } else {
-                await removeFromWatchlist(user.uid, mediaData, type);
+                await removeFromWatchlist(user?.uid, mediaData, type);
                 toast.success('Removed from watchlist');
             }
         } catch (error) {

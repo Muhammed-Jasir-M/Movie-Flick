@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { IoMenu, IoSearch } from 'react-icons/io5'
+import { BsBookmarkFill } from 'react-icons/bs'
 import { Link, NavLink } from 'react-router-dom'
 import { useAuthContext } from '../store/authContext'
 import Dropdown from './Dropdown'
@@ -21,7 +22,7 @@ const Header = () => {
         {
             label: 'TV Shows',
             href: '/tv',
-        },
+        }
     ];
 
     const handleScroll = useCallback(() => {
@@ -71,8 +72,12 @@ const Header = () => {
                 </nav>
 
                 <div className='flex items-center gap-3'>
-                    <Link to='/search'>
-                        <IoSearch className='cursor-pointer hidden sm:block lg:block text-3xl' />
+                    <Link to='/search' title="Search">
+                        <IoSearch className='cursor-pointer text-2xl hover:text-red-500 transition-colors' />
+                    </Link>
+
+                    <Link to='/watchlist' title="Watchlist">
+                        <BsBookmarkFill className='cursor-pointer text-xl hover:text-amber-400 transition-colors' />
                     </Link>
 
                     {

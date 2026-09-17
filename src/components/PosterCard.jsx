@@ -18,10 +18,10 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
     // Check if item is already in watchlist
     useEffect(() => {
         const checkStatus = async () => {
-            if (user?.uid && data?.id) {
+            if (data?.id) {
                 try {
-                    const list = await fetchWatchlist(user.uid);
-                    const exists = list.some((item) => item.id === data.id);
+                    const list = await fetchWatchlist(user?.uid);
+                    const exists = list.some((item) => Number(item.id) === Number(data.id) || item.id === `${mediaType}-${data.id}`);
                     setInWatchlist(exists);
                 } catch (e) {
                     console.error("Watchlist check error:", e);
@@ -29,16 +29,11 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
             }
         };
         checkStatus();
-    }, [user, data?.id, fetchWatchlist]);
+    }, [user?.uid, data?.id, mediaType, fetchWatchlist]);
 
     const handleWatchlistToggle = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-
-        if (!user) {
-            toast.error('Please log in to add to your watchlist');
-            return;
-        }
 
         const nextState = !(inWatchlist || isWatchlist);
         setInWatchlist(nextState); // Optimistic instant UI update
@@ -46,10 +41,10 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
 
         try {
             if (!nextState) {
-                await removeFromWatchlist(user.uid, data, mediaType);
+                await removeFromWatchlist(user?.uid, data, mediaType);
                 toast.success('Removed from watchlist');
             } else {
-                await addToWatchlist(user.uid, data, mediaType);
+                await addToWatchlist(user?.uid, data, mediaType);
                 toast.success('Added to watchlist');
             }
         } catch (error) {

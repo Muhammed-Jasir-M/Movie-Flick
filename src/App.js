@@ -55,14 +55,7 @@ const App = () => {
                                 </ProtectedRoute>
                             }
                         />
-                        <Route
-                            path="/watchlist"
-                            element={
-                                <ProtectedRoute>
-                                    <WatchList />
-                                </ProtectedRoute>
-                            }
-                        />
+                        <Route path="/watchlist" element={<WatchList />} />
                         <Route path='*' element={<NotFound />} />
                     </Routes>
                 </div>
