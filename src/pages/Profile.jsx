@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react'
-import { useAuthContext } from '../store/authContext'
+import React, { useState, useRef } from 'react';
+import { useAuthContext } from '../store/authContext';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { FaUserCircle } from 'react-icons/fa';
@@ -14,11 +14,10 @@ const Profile = () => {
     const [imageFileUrl, setImageFileUrl] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
 
-    const [showDeleteModal, setShowDeleteModal] = useState(false); 
-    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false); 
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
     const imagePickerRef = useRef(null);
-
     const { user, userData, uploadImage, updateUserProfile } = useAuthContext();
 
     const initialValues = {
@@ -28,13 +27,8 @@ const Profile = () => {
     };
 
     const profileSchema = Yup.object().shape({
-        name: Yup.string()
-            .min(2, 'Too Short!')
-            .max(50, 'Too Long!')
-            .required('Required'),
-        phone: Yup.string()
-            .required('Required')
-            .matches(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
+        name: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Full name is required'),
+        phone: Yup.string().required('Phone number is required').matches(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
     });
 
     const onSubmit = async (values) => {
@@ -66,7 +60,7 @@ const Profile = () => {
                 setImageFile(file);
                 setImageFileUrl(URL.createObjectURL(file));
             } else {
-                toast.error(`Please select an image file smaller than 2MB.`);
+                toast.error('Please select an image file smaller than 2MB.');
             }
         } else {
             toast.error('Please select a valid image file.');
@@ -74,180 +68,168 @@ const Profile = () => {
     };
 
     return (
-        <section className='pt-24 min-h-[700px] md:min-h-screen flex flex-col items-center'>
-            <h1 className='text-4xl font-bold'>Profile</h1>
-            <form className='flex flex-col gap-5 max-w-md w-full py-6 bg-slate-900 px-4 mt-6 mb-3 rounded-md' onSubmit={handleSubmit}>
-                <div className='w-full flex justify-center relative'>
-                    {user.photoURL || imageFileUrl
-                        ? (
-                            <img
-                                src={imageFileUrl || user.photoURL}
-                                alt='profile pic'
-                                className={`rounded-full border-4 border-slate-300 object-cover h-32 w-32`}
-                                referrerPolicy="no-referrer"
-                            />
-                        ) : (
-                            <FaUserCircle className='h-32 w-32' />
-                        )
-                    }
+        <section className="pt-24 pb-12 min-h-screen flex flex-col items-center px-4 bg-gradient-to-b from-[#0a1128] via-[#0f172a] to-[#0a1128]">
+            <div className="w-full max-w-lg bg-[#14213d]/80 backdrop-blur-md p-8 rounded-2xl border border-gray-800 shadow-2xl mt-4">
+                <h1 className="text-3xl font-extrabold text-white text-center mb-6">Account Profile</h1>
 
-                    <div className='hidden'>
+                <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+                    {/* Avatar Upload */}
+                    <div className="w-full flex justify-center relative my-2">
+                        <div className="relative group cursor-pointer" onClick={() => imagePickerRef.current.click()}>
+                            {user?.photoURL || imageFileUrl ? (
+                                <img
+                                    src={imageFileUrl || user.photoURL}
+                                    alt="Profile"
+                                    className="rounded-full border-4 border-red-500/80 object-cover h-28 w-28 shadow-xl"
+                                    referrerPolicy="no-referrer"
+                                />
+                            ) : (
+                                <FaUserCircle className="h-28 w-28 text-gray-400" />
+                            )}
+                            <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <ImPencil className="text-white text-xl" />
+                            </div>
+                        </div>
+
                         <input
-                            type='file'
-                            accept='image/*'
+                            type="file"
+                            accept="image/*"
                             onChange={handleChangeImage}
                             ref={imagePickerRef}
+                            className="hidden"
                         />
                     </div>
 
-                    <div
-                        className='absolute -bottom-1 right-[148px] bg-slate-700 rounded-full p-2.5 cursor-pointer'
-                        onClick={() => {
-                            imagePickerRef.current.click();
-                            setIsEditing(true);
-                        }}
-                    >
-                        <ImPencil />
+                    {/* Name */}
+                    <div className="relative">
+                        <label htmlFor="name" className="text-sm font-semibold text-gray-300 block mb-1.5">
+                            Full Name
+                        </label>
+                        <input
+                            type="text"
+                            id="name"
+                            placeholder="Name"
+                            className={`w-full h-11 rounded-xl text-white font-medium px-4 text-sm border outline-none transition-all ${
+                                !isEditing ? 'bg-slate-900/60 border-transparent text-gray-300' : 'bg-[#0f172a] border-gray-700 focus:border-red-500'
+                            } ${isEditing && errors.name && touched.name && 'border-red-500'}`}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            readOnly={!isEditing}
+                            value={values.name}
+                        />
+                        {isEditing && errors.name && touched.name && (
+                            <p className="text-red-400 font-medium mt-1 text-xs">{errors.name}</p>
+                        )}
+                        {!isEditing && (
+                            <button
+                                type="button"
+                                className="absolute right-3 top-9 text-gray-400 hover:text-white transition-colors"
+                                onClick={() => setIsEditing(true)}
+                            >
+                                <ImPencil size={14} />
+                            </button>
+                        )}
                     </div>
-                </div>
 
-                <div className='w-full relative'>
-                    <label htmlFor='name' className='text-white font-semibold block mb-1'>
-                        Name
-                    </label>
-
-                    <input
-                        type='text'
-                        id='name'
-                        placeholder='Name'
-                        className={`read-only:bg-slate-800 w-full h-12 rounded bg-[#14213d] text-white border-0 outline-none font-semibold text-base px-3 md:px-5 py-4 ${isEditing && errors.name && touched.name && 'outline outline-orange-700'}`}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        readOnly={!isEditing}
-                        value={values.name}
-                    />
-
-                    {isEditing && errors.name && touched.name && (
-                        <p className='text-orange-700 font-medium mt-1.5 text-sm'>{errors.name}</p>
-                    )}
-
-                    <div
-                        className={`${isEditing ? 'hidden' : 'block'} absolute right-2 top-[35px] bg-slate-700 rounded-full p-2 cursor-pointer`}
-                        onClick={() => {
-                            setIsEditing(true);
-                        }}
-                    >
-                        <ImPencil />
+                    {/* Email */}
+                    <div>
+                        <label htmlFor="email" className="text-sm font-semibold text-gray-300 block mb-1.5">
+                            Email Address (Read only)
+                        </label>
+                        <input
+                            type="text"
+                            id="email"
+                            className="w-full h-11 rounded-xl bg-slate-900/60 text-gray-400 font-medium px-4 text-sm border border-transparent outline-none cursor-not-allowed"
+                            readOnly={true}
+                            value={values.email}
+                        />
                     </div>
-                </div>
 
-                <div className='w-full relative'>
-                    <label htmlFor='email' className='text-white font-semibold block mb-1'>
-                        Email
-                    </label>
-
-                    <input
-                        type='text'
-                        placeholder='Email'
-                        id='email'
-                        className={`read-only:bg-slate-800 w-full h-12 rounded bg-[#14213d] text-white border-0 outline-none font-semibold text-base px-3 md:px-5 py-4`}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        readOnly={true}
-                        value={values.email}
-                    />
-
-                    <div
-                        className='hidden right-2 top-[35px] bg-slate-700 rounded-full p-2 cursor-pointer'
-                        onClick={() => {
-                        }}
-                    >
-                        <ImPencil />
+                    {/* Phone */}
+                    <div className="relative">
+                        <label htmlFor="phone" className="text-sm font-semibold text-gray-300 block mb-1.5">
+                            Phone Number
+                        </label>
+                        <input
+                            type="tel"
+                            id="phone"
+                            placeholder="Phone"
+                            className={`w-full h-11 rounded-xl text-white font-medium px-4 text-sm border outline-none transition-all ${
+                                !isEditing ? 'bg-slate-900/60 border-transparent text-gray-300' : 'bg-[#0f172a] border-gray-700 focus:border-red-500'
+                            } ${isEditing && errors.phone && touched.phone && 'border-red-500'}`}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            readOnly={!isEditing}
+                            value={values.phone}
+                        />
+                        {isEditing && errors.phone && touched.phone && (
+                            <p className="text-red-400 font-medium mt-1 text-xs">{errors.phone}</p>
+                        )}
+                        {!isEditing && (
+                            <button
+                                type="button"
+                                className="absolute right-3 top-9 text-gray-400 hover:text-white transition-colors"
+                                onClick={() => setIsEditing(true)}
+                            >
+                                <ImPencil size={14} />
+                            </button>
+                        )}
                     </div>
-                </div>
 
-                <div className='w-full relative'>
-                    <label htmlFor='phone' className='text-white font-semibold block mb-1'>
-                        Phone
-                    </label>
-
-                    <input
-                        type='tel'
-                        placeholder='Phone'
-                        id='phone'
-                        className={`read-only:bg-slate-800 w-full h-12 rounded bg-[#14213d] text-white border-0 outline-none font-semibold text-base px-3 md:px-5 py-4 ${isEditing && errors.phone && touched.phone && 'outline outline-orange-700'}`}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        readOnly={!isEditing}
-                        value={values.phone}
-                    />
-
-                    {isEditing && errors.phone && touched.phone && (
-                        <p className='text-orange-700 font-medium mt-1.5 text-sm'>{errors.phone}</p>
-                    )}
-
-                    <div
-                        className={`${isEditing ? 'hidden' : 'block'} absolute right-2 top-[35px] bg-slate-700 rounded-full p-2 cursor-pointer`}
-                        onClick={() => {
-                            setIsEditing(true);
-                        }}
-                    >
-                        <ImPencil />
-                    </div>
-                </div>
-
-                {
-                    isEditing &&
-                    <div className='w-full flex flex-col gap-2'>
-                        <button
-                            type='submit'
-                            className='w-full bg-[#e50914] hover:bg-[#e50914cb] text-white p-3 text-base font-semibold rounded cursor-pointer'
-                            disabled={isSubmitting || !isValid}
-                        >
-                            {
-                                isSubmitting ? (
-                                    <div className='flex items-center justify-center gap-3'>
-                                        <Spinner borderColor={'border-white'} />
-                                        <span className='text-lg'>
-                                            Saving...
-                                        </span>
+                    {/* Action Buttons */}
+                    {isEditing && (
+                        <div className="flex gap-3 mt-2">
+                            <button
+                                type="submit"
+                                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-xl font-bold text-sm shadow-md transition-all cursor-pointer"
+                                disabled={isSubmitting || !isValid}
+                            >
+                                {isSubmitting ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Spinner borderColor="border-white" />
+                                        <span>Saving...</span>
                                     </div>
                                 ) : (
-                                    <span className='text-lg'>
-                                        Save Changes
-                                    </span>
-                                )
-                            }
-                        </button>
-                    </div>
-                }
-            </form>
+                                    'Save Changes'
+                                )}
+                            </button>
+                            <button
+                                type="button"
+                                className="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors cursor-pointer"
+                                onClick={() => setIsEditing(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
+                </form>
 
-            <div className='flex justify-between items-center w-full max-w-md mb-6'>
-                {
-                    user.providerData[0].providerId === 'password' && (
+                {/* Account Settings Controls */}
+                <div className="pt-6 mt-6 border-t border-gray-800 flex flex-wrap justify-between items-center gap-3">
+                    {user?.providerData?.[0]?.providerId === 'password' && (
                         <button
-                            className='bg-red-600 hover:bg-green-700 text-white px-2 py-1 text-base font-semibold rounded cursor-pointer'
+                            type="button"
+                            className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer border border-gray-700"
                             onClick={() => setShowChangePasswordModal(true)}
                         >
                             Change Password
                         </button>
-                    )
-                }
+                    )}
 
-                <button
-                    type='button'
-                    className='bg-red-600 hover:bg-red-700 text-white px-2 py-1 text-base font-semibold rounded cursor-pointer'
-                    onClick={() => setShowDeleteModal(true)}
-                >
-                    Delete Account
-                </button>
+                    <button
+                        type="button"
+                        className="bg-red-950/60 hover:bg-red-900/80 text-red-400 hover:text-red-300 px-4 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer border border-red-900/50"
+                        onClick={() => setShowDeleteModal(true)}
+                    >
+                        Delete Account
+                    </button>
+                </div>
             </div>
 
             <DeleteModal showModal={showDeleteModal} onClose={() => setShowDeleteModal(false)} user={user} />
             <ChangePasswordModal showModal={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} user={user} />
         </section>
-    )
-}
+    );
+};
 
-export default Profile
+export default Profile;

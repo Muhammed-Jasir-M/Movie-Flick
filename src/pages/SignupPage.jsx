@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAuthContext } from '../store/authContext';
@@ -17,23 +17,16 @@ const initialValues = {
 };
 
 const signupSchema = Yup.object().shape({
-    name: Yup.string()
-        .min(2, 'Too Short!')
-        .max(50, 'Too Long!')
-        .required('Required'),
-    email: Yup.string()
-        .email('Invalid email')
-        .required('Required'),
-    phone: Yup.string()
-        .required('Required')
-        .matches(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
+    name: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Full name is required'),
+    email: Yup.string().email('Invalid email address').required('Email is required'),
+    phone: Yup.string().required('Phone number is required').matches(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
     password: Yup.string()
-        .required('Required')
-        .min(6, "Password must be at least 6 characters long")
-        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/, "Password must contain at least one uppercase letter, one lowercase letter, and one digit"),
+        .required('Password is required')
+        .min(6, 'Password must be at least 6 characters long')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/, 'Must contain uppercase, lowercase & number'),
     confirmPassword: Yup.string()
-        .required('Required')
-        .oneOf([Yup.ref('password'), ''], 'Password must match'),
+        .required('Please confirm your password')
+        .oneOf([Yup.ref('password'), null], 'Passwords must match'),
 });
 
 const SignupPage = () => {
@@ -46,11 +39,10 @@ const SignupPage = () => {
     const onSubmit = async (values) => {
         try {
             await signup(values.name, values.email, values.password, values.phone);
-            toast.success("Signup successful!");
-            navigate('/login');
+            toast.success("Account created successfully!");
+            navigate('/');
         } catch (error) {
             toast.error(`Signup failed: ${error.message}`);
-            console.error(`Signup failed: ${error.message}`);
         }
     };
 
@@ -61,169 +53,184 @@ const SignupPage = () => {
     });
 
     return (
-        <section className='min-h-screen pt-20 flex justify-center'>
+        <section className="min-h-screen pt-24 pb-12 flex justify-center items-center px-4 bg-gradient-to-b from-[#0a1128] via-[#0f172a] to-[#0a1128]">
             <form
-                className='flex flex-col items-center w-full gap-5 max-w-lg bg-slate-900 px-3 md:px-5 py-10 my-10 rounded-md'
+                className="flex flex-col w-full max-w-lg bg-[#14213d]/80 backdrop-blur-md p-8 md:p-10 rounded-2xl border border-gray-800 shadow-2xl my-6"
                 onSubmit={handleSubmit}
             >
-                <h1 className='text-3xl font-bold'>
-                    Sign Up
-                </h1>
+                <div className="text-center mb-6">
+                    <h1 className="text-3xl font-extrabold text-white tracking-tight">Create Account</h1>
+                    <p className="text-sm text-gray-400 mt-2">Join Movie Flick to save watchlists and explore</p>
+                </div>
 
-                <div className='w-full'>
-                    <label htmlFor='name' className='text-white font-semibold block mb-1'>
-                        Name
+                {/* Name */}
+                <div className="mb-4">
+                    <label htmlFor="name" className="text-sm font-semibold text-gray-300 block mb-1.5">
+                        Full Name
                     </label>
-
                     <input
-                        type='text'
-                        id='name'
-                        placeholder='Name'
-                        className={`w-full h-12 rounded bg-[#14213d] text-white border-0 outline-none font-semibold text-base px-3 md:px-5 py-4 ${errors.name && touched.name && 'outline outline-orange-700'}`}
+                        type="text"
+                        placeholder="John Doe"
+                        id="name"
+                        className={`w-full h-11 rounded-xl bg-[#0f172a] text-white border outline-none font-medium px-4 text-sm transition-all ${
+                            errors.name && touched.name
+                                ? 'border-red-500 focus:ring-2 focus:ring-red-500/50'
+                                : 'border-gray-700 focus:border-red-500 focus:ring-2 focus:ring-red-500/30'
+                        }`}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         value={values.name}
                     />
-
                     {errors.name && touched.name && (
-                        <p className='text-orange-700 font-medium mt-1.5 text-sm'>{errors.name}</p>
+                        <p className="text-red-400 font-medium mt-1 text-xs">{errors.name}</p>
                     )}
                 </div>
 
-                <div className='w-full'>
-                    <label htmlFor='email' className='text-white font-semibold block mb-1'>
-                        Email
+                {/* Email */}
+                <div className="mb-4">
+                    <label htmlFor="email" className="text-sm font-semibold text-gray-300 block mb-1.5">
+                        Email Address
                     </label>
-
                     <input
-                        type='text'
-                        placeholder='Email'
-                        id='email'
-                        className={`w-full h-12 rounded bg-[#14213d] text-white border-0 outline-none font-semibold text-base px-3 md:px-5 py-4 ${errors.email && touched.email && 'outline outline-orange-700'}`}
+                        type="email"
+                        placeholder="you@example.com"
+                        id="email"
+                        className={`w-full h-11 rounded-xl bg-[#0f172a] text-white border outline-none font-medium px-4 text-sm transition-all ${
+                            errors.email && touched.email
+                                ? 'border-red-500 focus:ring-2 focus:ring-red-500/50'
+                                : 'border-gray-700 focus:border-red-500 focus:ring-2 focus:ring-red-500/30'
+                        }`}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         value={values.email}
                     />
-
                     {errors.email && touched.email && (
-                        <p className='text-orange-700 font-medium mt-1.5 text-sm'>{errors.email}</p>
+                        <p className="text-red-400 font-medium mt-1 text-xs">{errors.email}</p>
                     )}
                 </div>
 
-                <div className='w-full'>
-                    <label htmlFor='phone' className='text-white font-semibold block mb-1'>
-                        Phone
+                {/* Phone */}
+                <div className="mb-4">
+                    <label htmlFor="phone" className="text-sm font-semibold text-gray-300 block mb-1.5">
+                        Phone Number
                     </label>
-
                     <input
-                        type='tel'
-                        placeholder='Phone'
-                        id='phone'
-                        className={`w-full h-12 rounded bg-[#14213d] text-white border-0 outline-none font-semibold text-base px-3 md:px-5 py-4 ${errors.phone && touched.phone && 'outline outline-orange-700'}`}
+                        type="tel"
+                        placeholder="+1 234 567 890"
+                        id="phone"
+                        className={`w-full h-11 rounded-xl bg-[#0f172a] text-white border outline-none font-medium px-4 text-sm transition-all ${
+                            errors.phone && touched.phone
+                                ? 'border-red-500 focus:ring-2 focus:ring-red-500/50'
+                                : 'border-gray-700 focus:border-red-500 focus:ring-2 focus:ring-red-500/30'
+                        }`}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         value={values.phone}
                     />
-
                     {errors.phone && touched.phone && (
-                        <p className='text-orange-700 font-medium mt-1.5 text-sm'>{errors.phone}</p>
+                        <p className="text-red-400 font-medium mt-1 text-xs">{errors.phone}</p>
                     )}
                 </div>
 
-                <div className='w-full relative'>
-                    <label htmlFor='password' className='text-white font-semibold block mb-1'>
+                {/* Password */}
+                <div className="mb-4 relative">
+                    <label htmlFor="password" className="text-sm font-semibold text-gray-300 block mb-1.5">
                         Password
                     </label>
-
-                    <input
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder='Password'
-                        id='password'
-                        className={`w-full h-12 rounded bg-[#14213d] text-white border-0 outline-none font-semibold text-base px-3 md:px-5 py-4 ${errors.password && touched.password && 'outline outline-orange-700'}`}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.password}
-                    />
-
-                    <span
-                        className='absolute top-11 right-3 text-lg cursor-pointer font-semibold'
-                        onClick={() => setShowPassword(!showPassword)}
-                    >
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
-
+                    <div className="relative">
+                        <input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Create a strong password"
+                            id="password"
+                            className={`w-full h-11 rounded-xl bg-[#0f172a] text-white border outline-none font-medium px-4 pr-12 text-sm transition-all ${
+                                errors.password && touched.password
+                                    ? 'border-red-500 focus:ring-2 focus:ring-red-500/50'
+                                    : 'border-gray-700 focus:border-red-500 focus:ring-2 focus:ring-red-500/30'
+                            }`}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.password}
+                        />
+                        <button
+                            type="button"
+                            className="absolute top-1/2 -translate-y-1/2 right-4 text-gray-400 hover:text-white transition-colors"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                        </button>
+                    </div>
                     {errors.password && touched.password && (
-                        <p className='text-orange-700 font-medium mt-1.5 text-sm'>{errors.password}</p>
+                        <p className="text-red-400 font-medium mt-1 text-xs">{errors.password}</p>
                     )}
                 </div>
 
-                <div className='w-full relative'>
-                    <label htmlFor='confirmPassword' className='text-white font-semibold block mb-1'>
+                {/* Confirm Password */}
+                <div className="mb-6 relative">
+                    <label htmlFor="confirmPassword" className="text-sm font-semibold text-gray-300 block mb-1.5">
                         Confirm Password
                     </label>
-
-                    <input
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        placeholder='Confirm your password'
-                        id='confirmPassword'
-                        className={`w-full h-12 rounded bg-[#14213d] text-white border-0 outline-none font-semibold text-base px-3 md:px-5 py-4 ${errors.confirmPassword && touched.confirmPassword && 'outline outline-orange-700'}`}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.confirmPassword}
-                    />
-
-                    <span
-                        className='absolute top-11 right-3 text-lg cursor-pointer font-semibold'
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
-
+                    <div className="relative">
+                        <input
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            placeholder="Confirm your password"
+                            id="confirmPassword"
+                            className={`w-full h-11 rounded-xl bg-[#0f172a] text-white border outline-none font-medium px-4 pr-12 text-sm transition-all ${
+                                errors.confirmPassword && touched.confirmPassword
+                                    ? 'border-red-500 focus:ring-2 focus:ring-red-500/50'
+                                    : 'border-gray-700 focus:border-red-500 focus:ring-2 focus:ring-red-500/30'
+                            }`}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.confirmPassword}
+                        />
+                        <button
+                            type="button"
+                            className="absolute top-1/2 -translate-y-1/2 right-4 text-gray-400 hover:text-white transition-colors"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                            {showConfirmPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                        </button>
+                    </div>
                     {errors.confirmPassword && touched.confirmPassword && (
-                        <p className='text-orange-700 font-medium mt-1.5 text-sm'>{errors.confirmPassword}</p>
+                        <p className="text-red-400 font-medium mt-1 text-xs">{errors.confirmPassword}</p>
                     )}
                 </div>
 
-                <div className='w-full flex flex-col gap-2'>
-                    <button
-                        type='submit'
-                        className='w-full bg-[#e50914] hover:bg-[#e50914cb] text-white p-3 text-base font-semibold rounded cursor-pointer'
-                        disabled={isSubmitting || !isValid}
-                    >
-                        {
-                            isSubmitting ? (
-                                <div className='flex items-center justify-center gap-3'>
-                                    <Spinner borderColor={'border-white'} />
-                                    <span className='text-lg'>
-                                        Loading...
-                                    </span>
-                                </div>
-                            ) : (
-                                <span className='text-lg'>
-                                    Sign Up
-                                </span>
-                            )
-                        }
-                    </button>
-                </div>
+                {/* Submit Button */}
+                <button
+                    type="submit"
+                    className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white py-3 rounded-xl font-bold text-base shadow-lg shadow-red-600/30 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                    disabled={isSubmitting || !isValid}
+                >
+                    {isSubmitting ? (
+                        <div className="flex items-center justify-center gap-3">
+                            <Spinner borderColor="border-white" />
+                            <span>Creating Account...</span>
+                        </div>
+                    ) : (
+                        'Sign Up'
+                    )}
+                </button>
 
-                <div className='w-full flex items-center gap-1.5 text-[#b3b3b3] font-medium'>
-                    Already have an Account?
-                    <Link to='/login'>
-                        <span className='text-[#fff] font-semibold hover:underline hover:underline-offset-2 cursor-pointer'>
-                            Login
-                        </span>
+                {/* Login Redirect */}
+                <p className="text-sm text-center text-gray-400 mt-5">
+                    Already have an account?{' '}
+                    <Link to="/login" className="text-white font-semibold hover:text-red-400 hover:underline">
+                        Sign In
                     </Link>
+                </p>
+
+                {/* Divider & OAuth */}
+                <div className="relative flex py-4 items-center my-1">
+                    <div className="flex-grow border-t border-gray-700"></div>
+                    <span className="flex-shrink mx-4 text-xs font-semibold text-gray-500 uppercase">OR</span>
+                    <div className="flex-grow border-t border-gray-700"></div>
                 </div>
 
-                <div className='w-full'>
-                    <span className='flex justify-center text-lg'>or</span>
-
-                    <OAuth />
-                </div>
+                <OAuth />
             </form>
         </section>
-    )
-}
+    );
+};
 
-export default SignupPage
+export default SignupPage;

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { FaUser, FaUserCircle } from 'react-icons/fa'
+import React, { useEffect, useRef, useState } from 'react';
+import { FaUser, FaUserCircle } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../store/authContext';
 import { toast } from 'react-toastify';
@@ -16,10 +16,10 @@ const Dropdown = ({ user }) => {
     const handleSignout = async () => {
         try {
             await signout();
-            toast.success('Signout success!');
+            toast.success('Signed out successfully');
             navigate('/login');
         } catch (error) {
-            toast.error('Signout failed!');
+            toast.error('Signout failed');
         }
     };
 
@@ -31,65 +31,77 @@ const Dropdown = ({ user }) => {
         };
 
         document.addEventListener('mousedown', handleClickOutside);
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [menuRef]);
 
     return (
-        <div className='relative' ref={menuRef}>
-            <div onClick={() => setOpen(!open)}>
-                {user.photoURL
-                    ? (
-                        <img
-                            src={user.photoURL}
-                            alt='profile pic'
-                            className={`rounded-full object-cover cursor-pointer h-8 w-8`}
-                            referrerPolicy="no-referrer"
-                        />
-                    ) : (
-                        <FaUserCircle className='cursor-pointer h-8 w-8' />
-                    )
-                }
+        <div className="relative" ref={menuRef}>
+            <div
+                onClick={() => setOpen(!open)}
+                className="cursor-pointer transition-transform hover:scale-105 active:scale-95"
+            >
+                {user?.photoURL ? (
+                    <img
+                        src={user.photoURL}
+                        alt="Profile"
+                        className="rounded-full object-cover h-9 w-9 border-2 border-red-500/80 shadow-md"
+                        referrerPolicy="no-referrer"
+                    />
+                ) : (
+                    <FaUserCircle className="h-9 w-9 text-gray-300 hover:text-white transition-colors" />
+                )}
             </div>
 
             {open && (
-                <div className='absolute top-14 right-5 bg-[#14213d] rounded-md px-2.5 py-5 w-[200px]'>
-                    <h4 className='text-base truncate'>
-                        {user.displayName}
-                    </h4>
+                <div className="absolute top-12 right-0 bg-[#0f172a] text-white rounded-xl shadow-2xl border border-gray-800 p-3 w-[220px] z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-2 py-1.5 border-b border-gray-800">
+                        <h4 className="text-sm font-bold text-white truncate">
+                            {user?.displayName || 'User'}
+                        </h4>
+                        <p className="text-xs text-gray-400 truncate mt-0.5">
+                            {user?.email}
+                        </p>
+                    </div>
 
-                    <p className='text-sm truncate'>
-                        {user.email}
-                    </p>
-
-                    <hr className='my-2.5' />
-
-                    <ul className='flex flex-col gap-2'>
-                        <DropdownItem icon={<FaUser />} label={'Profile'} href={'/profile'} />
-                        <DropdownItem icon={<BsBookmarkFill />} label={'Watchlist'} href={'/watchlist'} />
-                        <DropdownItem icon={<RiLogoutBoxRLine />} label={'Signout'} onClick={handleSignout} />
+                    <ul className="flex flex-col gap-1 mt-2">
+                        <DropdownItem
+                            icon={<FaUser className="text-base text-gray-400 group-hover:text-red-500" />}
+                            label="Profile"
+                            href="/profile"
+                            onClick={() => setOpen(false)}
+                        />
+                        <DropdownItem
+                            icon={<BsBookmarkFill className="text-base text-gray-400 group-hover:text-red-500" />}
+                            label="Watchlist"
+                            href="/watchlist"
+                            onClick={() => setOpen(false)}
+                        />
+                        <li
+                            onClick={() => {
+                                setOpen(false);
+                                handleSignout();
+                            }}
+                            className="group flex items-center gap-3 text-sm font-medium px-2.5 py-2 rounded-lg text-red-400 hover:bg-red-600/10 hover:text-red-500 cursor-pointer transition-colors mt-1"
+                        >
+                            <RiLogoutBoxRLine className="text-base text-red-400 group-hover:text-red-500" />
+                            <span>Sign Out</span>
+                        </li>
                     </ul>
                 </div>
             )}
         </div>
-    )
-}
+    );
+};
 
 const DropdownItem = ({ icon, label, href, onClick }) => {
     return (
         <Link to={href} onClick={onClick}>
-            <li className='flex items-center gap-3 text-xl hover:bg-slate-900 px-2 py-1 rounded'>
+            <li className="group flex items-center gap-3 text-sm font-medium px-2.5 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white cursor-pointer transition-colors">
                 {icon}
-
-                <span className='text-lg'>
-                    {label}
-                </span>
+                <span>{label}</span>
             </li>
         </Link>
-    )
-}
+    );
+};
 
-export default Dropdown
+export default Dropdown;

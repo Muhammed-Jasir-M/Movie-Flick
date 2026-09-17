@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAuthContext } from '../store/authContext';
@@ -14,25 +14,19 @@ const initialValues = {
 };
 
 const loginSchema = Yup.object().shape({
-    email: Yup.string()
-        .email('Invalid email')
-        .required('Required'),
-    password: Yup.string()
-        .required('Required')
-        .min(6, "Password must be at least 6 characters long")
-        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/, "Password must contain at least one uppercase letter, one lowercase letter, and one digit"),
+    email: Yup.string().email('Invalid email address').required('Email is required'),
+    password: Yup.string().required('Password is required'),
 });
 
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
-
     const navigate = useNavigate();
     const { login } = useAuthContext();
 
     const onSubmit = async (values) => {
         try {
             await login(values.email, values.password);
-            toast.success("Login successful!");
+            toast.success("Welcome back!");
             navigate('/');
         } catch (error) {
             toast.error(`Login failed: ${error.message}`);
@@ -46,107 +40,113 @@ const LoginPage = () => {
     });
 
     return (
-        <section className='min-h-screen pt-20 flex justify-center'>
+        <section className="min-h-screen pt-24 pb-12 flex justify-center items-center px-4 bg-gradient-to-b from-[#0a1128] via-[#0f172a] to-[#0a1128]">
             <form
-                className='flex flex-col items-center w-full gap-5 max-w-lg bg-slate-900 px-3 md:px-5 py-10 my-10 rounded-md'
+                className="flex flex-col w-full max-w-md bg-[#14213d]/80 backdrop-blur-md p-8 md:p-10 rounded-2xl border border-gray-800 shadow-2xl"
                 onSubmit={handleSubmit}
             >
-                <h1 className='text-3xl font-bold'>
-                    Login
-                </h1>
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-extrabold text-white tracking-tight">Welcome Back</h1>
+                    <p className="text-sm text-gray-400 mt-2">Sign in to your Movie Flick account</p>
+                </div>
 
-                <div className='w-full'>
-                    <label htmlFor='email' className='text-white font-semibold block mb-1'>
-                        Email
+                {/* Email Field */}
+                <div className="mb-5">
+                    <label htmlFor="email" className="text-sm font-semibold text-gray-300 block mb-2">
+                        Email Address
                     </label>
-
                     <input
-                        type='text'
-                        placeholder='Email'
-                        id='email'
-                        className={`w-full h-12 rounded bg-[#14213d] text-white border-0 outline-none font-semibold text-base px-3 md:px-5 py-4 ${errors.email && touched.email && 'outline outline-orange-700'}`}
+                        type="email"
+                        placeholder="you@example.com"
+                        id="email"
+                        className={`w-full h-12 rounded-xl bg-[#0f172a] text-white border outline-none font-medium px-4 text-sm transition-all ${
+                            errors.email && touched.email
+                                ? 'border-red-500 focus:ring-2 focus:ring-red-500/50'
+                                : 'border-gray-700 focus:border-red-500 focus:ring-2 focus:ring-red-500/30'
+                        }`}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         value={values.email}
                     />
-
                     {errors.email && touched.email && (
-                        <p className='text-orange-700 font-medium mt-1.5 text-sm'>{errors.email}</p>
+                        <p className="text-red-400 font-medium mt-1.5 text-xs">{errors.email}</p>
                     )}
                 </div>
 
-                <div className='w-full relative'>
-                    <label htmlFor='password' className='text-white font-semibold block mb-1'>
-                        Password
-                    </label>
+                {/* Password Field */}
+                <div className="mb-6 relative">
+                    <div className="flex justify-between items-center mb-2">
+                        <label htmlFor="password" className="text-sm font-semibold text-gray-300">
+                            Password
+                        </label>
+                        <Link to="/reset" className="text-xs text-red-400 hover:text-red-300 transition-colors font-medium">
+                            Forgot Password?
+                        </Link>
+                    </div>
 
-                    <input
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder='Password'
-                        id='password'
-                        className={`w-full h-12 rounded bg-[#14213d] text-white border-0 outline-none font-semibold text-base px-3 md:px-5 py-4 ${errors.password && touched.password && 'outline outline-orange-700'}`}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.password}
-                    />
-                    <Link to='/reset'>
-                        <p className='text-sm text-[#b3b3b3] text-right hover:underline hover:underline-offset-2 mt-1 cursor-pointer'>
-                            Forgot your Password?
-                        </p>
-                    </Link>
-
-                    <span
-                        className='absolute top-11 right-3 text-lg cursor-pointer font-semibold'
-                        onClick={() => setShowPassword(!showPassword)}
-                    >
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
+                    <div className="relative">
+                        <input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Enter your password"
+                            id="password"
+                            className={`w-full h-12 rounded-xl bg-[#0f172a] text-white border outline-none font-medium px-4 pr-12 text-sm transition-all ${
+                                errors.password && touched.password
+                                    ? 'border-red-500 focus:ring-2 focus:ring-red-500/50'
+                                    : 'border-gray-700 focus:border-red-500 focus:ring-2 focus:ring-red-500/30'
+                            }`}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.password}
+                        />
+                        <button
+                            type="button"
+                            className="absolute top-1/2 -translate-y-1/2 right-4 text-gray-400 hover:text-white transition-colors"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                        </button>
+                    </div>
 
                     {errors.password && touched.password && (
-                        <p className='text-orange-700 font-medium mt-1.5 text-sm'>{errors.password}</p>
+                        <p className="text-red-400 font-medium mt-1.5 text-xs">{errors.password}</p>
                     )}
                 </div>
 
-                <div className='w-full flex flex-col gap-2'>
-                    <button
-                        type='submit'
-                        className='w-full bg-[#e50914] hover:bg-[#e50914cb] text-white p-3 text-base font-semibold rounded cursor-pointer'
-                        disabled={isSubmitting || !isValid}
-                    >
-                        {
-                            isSubmitting ? (
-                                <div className='flex items-center justify-center gap-3'>
-                                    <Spinner borderColor={'border-white'} />
-                                    <span className='text-lg'>
-                                        Loading...
-                                    </span>
-                                </div>
-                            ) : (
-                                <span className='text-lg'>
-                                    Login
-                                </span>
-                            )
-                        }
-                    </button>
-                </div>
+                {/* Submit Button */}
+                <button
+                    type="submit"
+                    className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white py-3 rounded-xl font-bold text-base shadow-lg shadow-red-600/30 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                    disabled={isSubmitting || !isValid}
+                >
+                    {isSubmitting ? (
+                        <div className="flex items-center justify-center gap-3">
+                            <Spinner borderColor="border-white" />
+                            <span>Signing In...</span>
+                        </div>
+                    ) : (
+                        'Sign In'
+                    )}
+                </button>
 
-                <div className='w-full flex items-center gap-1.5 text-[#b3b3b3] font-medium'>
-                    Dont have an Account?
-                    <Link to='/signup'>
-                        <span className='text-[#fff] font-semibold hover:underline hover:underline-offset-2 cursor-pointer'>
-                            Signup
-                        </span>
+                {/* Signup Redirect */}
+                <p className="text-sm text-center text-gray-400 mt-6">
+                    Don't have an account?{' '}
+                    <Link to="/signup" className="text-white font-semibold hover:text-red-400 hover:underline">
+                        Sign Up
                     </Link>
+                </p>
+
+                {/* Divider & OAuth */}
+                <div className="relative flex py-5 items-center my-2">
+                    <div className="flex-grow border-t border-gray-700"></div>
+                    <span className="flex-shrink mx-4 text-xs font-semibold text-gray-500 uppercase">OR</span>
+                    <div className="flex-grow border-t border-gray-700"></div>
                 </div>
 
-                <div className='w-full'>
-                    <span className='flex justify-center text-lg'>or</span>
-
-                    <OAuth />
-                </div>
+                <OAuth />
             </form>
         </section>
-    )
-}
+    );
+};
 
-export default LoginPage
+export default LoginPage;
