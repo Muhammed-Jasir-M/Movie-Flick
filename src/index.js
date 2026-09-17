@@ -14,13 +14,12 @@ root.render(
         <AuthContextProvider>
             <WatchlistContextProvider>
                 <ToastContainer
-                    position="top-right"
-                    autoClose={5000}
+                    position="bottom-right"
+                    autoClose={2500}
                     hideProgressBar={false}
                     closeOnClick
                     pauseOnHover
                     draggable
-                    pauseOnFocusLoss
                     theme="dark"
                     newestOnTop={true}
                 />
