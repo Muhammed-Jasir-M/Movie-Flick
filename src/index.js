@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { WatchlistContextProvider } from './store/watchlistContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -39,6 +40,7 @@ root.render(
                     <App />
                 </WatchlistContextProvider>
             </AuthContextProvider>
+            <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
     </React.StrictMode>
 );
