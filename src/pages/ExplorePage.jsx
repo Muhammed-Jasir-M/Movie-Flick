@@ -95,9 +95,9 @@ const ExplorePage = () => {
 
             {/* Results Grid */}
             {loading && page === 1 ? (
-                <PosterCardSkeleton count={12} />
+                <PosterCardSkeleton count={14} />
             ) : data.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 md:gap-x-5 gap-y-4 pt-2 pb-4 w-full">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-x-3 md:gap-x-4 gap-y-4 pt-2 pb-4 w-full">
                     {data.map((item, index) => (
                         <PosterCard
                             key={`${item.id}-${index}`}

@@ -59,8 +59,8 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
     const widthClasses = isGrid
         ? 'w-full h-full'
         : isSmall
-        ? 'min-w-[155px] max-w-[155px] sm:min-w-[195px] sm:max-w-[195px] md:min-w-[215px] md:max-w-[215px]'
-        : 'min-w-[185px] max-w-[185px] sm:min-w-[215px] sm:max-w-[215px]';
+        ? 'min-w-[140px] max-w-[140px] sm:min-w-[170px] sm:max-w-[170px] md:min-w-[185px] md:max-w-[185px]'
+        : 'min-w-[165px] max-w-[165px] sm:min-w-[185px] sm:max-w-[185px]';
 
     const imgHeightClasses = 'aspect-[2/3] w-full';
 
