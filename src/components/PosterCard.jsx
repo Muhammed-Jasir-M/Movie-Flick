@@ -57,16 +57,12 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGri
     };
 
     const widthClasses = isGrid
-        ? 'w-full h-full min-h-[240px] sm:min-h-[290px]'
+        ? 'w-full h-full'
         : isSmall
-        ? 'min-w-[150px] max-w-[150px] h-[230px] sm:min-w-[190px] sm:max-w-[190px] sm:h-[290px] md:min-w-[210px] md:max-w-[210px] md:h-[320px]'
-        : 'min-w-[210px] max-w-[210px] h-[320px]';
+        ? 'min-w-[155px] max-w-[155px] sm:min-w-[195px] sm:max-w-[195px] md:min-w-[215px] md:max-w-[215px]'
+        : 'min-w-[185px] max-w-[185px] sm:min-w-[215px] sm:max-w-[215px]';
 
-    const imgHeightClasses = isGrid
-        ? 'aspect-[2/3] w-full'
-        : isSmall
-        ? 'h-[175px] sm:h-[230px] md:h-[260px]'
-        : 'h-[260px]';
+    const imgHeightClasses = 'aspect-[2/3] w-full';
 
     return (
         <Link to={`/${mediaType}/${data?.id}`} className={isGrid ? 'w-full' : ''}>

@@ -4,10 +4,12 @@ import PosterCard from './PosterCard';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
 import { SliderSkeleton } from './SkeletonLoaders';
+import useHorizontalScroll from '../hooks/useHorizontalScroll';
 
 const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const sliderRef = useRef(null);
 
     const fetchByCategory = useCallback(async () => {
         setLoading(true);
@@ -44,7 +46,7 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
         }
     }, [genreId, fetchByCategory, fetchByGenreId]);
 
-    const sliderRef = useRef(null);
+    useHorizontalScroll(sliderRef, [data]);
 
     const handleScrollLeft = () => {
         if (sliderRef.current) {

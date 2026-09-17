@@ -1,14 +1,20 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import axiosInstance from '../services/axios';
 import { Link, useParams } from 'react-router-dom';
 import { getImageUrl } from '../constants/constants';
 import { CastSkeleton } from './SkeletonLoaders';
+import useHorizontalScroll from '../hooks/useHorizontalScroll';
 
 const CastList = () => {
     const [casts, setCasts] = useState([]);
     const [crews, setCrews] = useState([]);
-
     const [loading, setLoading] = useState(false);
+
+    const castRef = useRef(null);
+    const crewRef = useRef(null);
+
+    useHorizontalScroll(castRef, [casts]);
+    useHorizontalScroll(crewRef, [crews]);
 
     const { type, id } = useParams();
 
@@ -51,7 +57,7 @@ const CastList = () => {
                                 </span>
                             </h2>
 
-                            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-3 pt-1">
+                            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-3 pt-1" ref={castRef}>
                                 {casts.map((cast, index) => (
                                     <Link
                                         to={`/person/${cast?.id}`}
@@ -95,7 +101,7 @@ const CastList = () => {
                                 </span>
                             </h2>
 
-                            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-3 pt-1">
+                            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-3 pt-1" ref={crewRef}>
                                 {crews.map((crew, index) => (
                                     <Link
                                         to={`/person/${crew?.id}`}
