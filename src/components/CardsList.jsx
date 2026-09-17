@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import axiosInstance from '../services/axios';
+import tmdbApi from '../api/tmdbApi';
 import PosterCard from './PosterCard';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
@@ -12,10 +12,10 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
     const fetchByCategory = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get(`${endpoint}`);
-            setData(response.data.results);
+            const res = await tmdbApi.getByEndpoint(endpoint);
+            setData(res.results);
         } catch (error) {
-            console.error("Error fetching:", error);
+            console.error("Error fetching category list:", error);
         } finally {
             setLoading(false);
         }
@@ -24,15 +24,13 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
     const fetchByGenreId = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get(`/discover/${type}`, {
-                params: {
-                    with_genres: genreId,
-                    sort_by: 'popularity.desc',
-                },
+            const res = await tmdbApi.getDiscoverMedia(type, {
+                with_genres: genreId,
+                sort_by: 'popularity.desc',
             });
-            setData(response.data.results);
+            setData(res.results);
         } catch (error) {
-            console.error("Error fetching:", error);
+            console.error("Error fetching genre list:", error);
         } finally {
             setLoading(false);
         }

@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axiosInstance from '../services/axios';
+import tmdbApi from '../api/tmdbApi';
 import { getImageUrl } from '../constants/constants';
 import PosterCard from '../components/PosterCard';
 import { PersonDetailsSkeleton } from '../components/SkeletonLoaders';
+import useInfiniteScroll from '../hooks/useInfiniteScroll';
 import moment from 'moment';
 
 const PersonDetails = () => {
@@ -17,15 +18,15 @@ const PersonDetails = () => {
     const fetchPersonDetails = useCallback(async () => {
         setLoading(true);
         try {
-            const [personRes, creditsRes] = await Promise.all([
-                axiosInstance.get(`/person/${id}`),
-                axiosInstance.get(`/person/${id}/combined_credits`)
+            const [personData, creditsData] = await Promise.all([
+                tmdbApi.getPersonDetails(id),
+                tmdbApi.getPersonCredits(id)
             ]);
 
-            setPerson(personRes.data);
+            setPerson(personData);
 
             // Filter and sort top credits by popularity
-            const sortedCredits = (creditsRes.data.cast || [])
+            const sortedCredits = (creditsData.cast || [])
                 .filter(item => item.poster_path)
                 .sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
 
@@ -37,16 +38,11 @@ const PersonDetails = () => {
         }
     }, [id]);
 
-    const handleScroll = useCallback(() => {
-        if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 400) && visibleCount < credits.length) {
-            setVisibleCount(prev => Math.min(prev + 10, credits.length));
-        }
-    }, [visibleCount, credits.length]);
+    const handleLoadMore = useCallback(() => {
+        setVisibleCount(prev => Math.min(prev + 10, credits.length));
+    }, [credits.length]);
 
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [handleScroll]);
+    useInfiniteScroll(handleLoadMore, visibleCount < credits.length, loading, 400);
 
     useEffect(() => {
         fetchPersonDetails();

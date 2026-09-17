@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from '../services/axios';
+import tmdbApi from '../api/tmdbApi';
 import { getImageUrl } from '../constants/constants';
 import { Link } from 'react-router-dom';
 import { FaPlay, FaRegCalendarAlt, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
@@ -23,11 +23,10 @@ const Banner = ({ mediaType }) => {
     const fetchTrendingAll = async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get("trending/all/week");
-            const filteredData = response.data.results.filter(item => item.media_type !== 'person');
-            setTrendingData(filteredData);
+            const data = await tmdbApi.getTrendingAll();
+            setTrendingData(data);
         } catch (error) {
-            console.error("Error fetching:", error);
+            console.error("Error fetching trending all:", error);
         } finally {
             setLoading(false);
         }
@@ -36,8 +35,8 @@ const Banner = ({ mediaType }) => {
     const fetchTrending = async (type, time) => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get(`trending/${type}/${time}`);
-            setTrendingData(response.data.results);
+            const data = await tmdbApi.getTrending(type, time);
+            setTrendingData(data);
         } catch (error) {
             console.error("Error fetching trending data:", error);
         } finally {
@@ -48,17 +47,8 @@ const Banner = ({ mediaType }) => {
     const fetchTrendingAnime = async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get('/discover/tv', {
-                params: {
-                    with_genres: 16,
-                    sort_by: 'popularity.desc',
-                },
-            });
-            const results = (response.data?.results || []).map((item) => ({
-                ...item,
-                media_type: 'tv',
-            }));
-            setTrendingData(results);
+            const res = await tmdbApi.getTrendingAnime();
+            setTrendingData(res.results);
         } catch (error) {
             console.error("Error fetching anime banner:", error);
         } finally {

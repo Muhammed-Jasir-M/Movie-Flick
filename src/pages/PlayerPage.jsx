@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axiosInstance from '../services/axios';
+import tmdbApi from '../api/tmdbApi';
 import Spinner from '../components/Spinner';
 import Player from '../components/Player';
 import { BiArrowBack } from 'react-icons/bi';
@@ -23,11 +23,7 @@ const PlayerPage = () => {
     const fetchVideos = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get(`${type}/${id}/videos`, {
-                params: { include_video_language: 'en,hi,ta,te,ml,null' }
-            });
-
-            const results = response.data?.results || [];
+            const results = await tmdbApi.getMediaVideos(type, id);
 
             if (results.length === 0) {
                 setIsEmpty(true);

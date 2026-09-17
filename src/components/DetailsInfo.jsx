@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import axiosInstance from '../services/axios';
+import tmdbApi from '../api/tmdbApi';
 import { Link, useParams } from 'react-router-dom';
 import { getImageUrl } from '../constants/constants';
 import { FaBookmark, FaExternalLinkAlt, FaPlay, FaRegBookmark, FaRegCalendarAlt, FaRegClock, FaStar } from 'react-icons/fa';
@@ -29,9 +29,9 @@ const DetailsInfo = () => {
         setError(false);
 
         try {
-            const response = await axiosInstance.get(`/${mediaType}/${id}`);
-            if (response.data && response.data.id) {
-                setMediaData(response.data);
+            const data = await tmdbApi.getMediaDetails(mediaType, id);
+            if (data && data.id) {
+                setMediaData(data);
             } else {
                 setError(true);
             }

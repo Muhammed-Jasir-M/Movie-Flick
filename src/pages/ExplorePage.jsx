@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import axiosInstance from '../services/axios';
+import tmdbApi from '../api/tmdbApi';
 import Spinner from '../components/Spinner';
 import PosterCard from '../components/PosterCard';
 import { PosterCardSkeleton } from '../components/SkeletonLoaders';
+import useInfiniteScroll from '../hooks/useInfiniteScroll';
 import { FaArrowLeft } from 'react-icons/fa';
 
 const ExplorePage = () => {
@@ -45,24 +46,19 @@ const ExplorePage = () => {
         }
 
         try {
-            let response;
+            let res;
             if (genreId) {
-                response = await axiosInstance.get(`/discover/${type || 'movie'}`, {
-                    params: {
-                        with_genres: genreId,
-                        sort_by: 'popularity.desc',
-                        page: page,
-                    },
+                res = await tmdbApi.getDiscoverMedia(type || 'movie', {
+                    with_genres: genreId,
+                    sort_by: 'popularity.desc',
+                    page,
                 });
             } else {
-                response = await axiosInstance.get(endpoint, {
-                    params: { page: page },
-                });
+                res = await tmdbApi.getByEndpoint(endpoint, { page });
             }
 
-            const results = response.data?.results || [];
-            setData((prev) => (page === 1 ? results : [...prev, ...results]));
-            setTotalPages(response.data?.total_pages || 1);
+            setData((prev) => (page === 1 ? res.results : [...prev, ...res.results]));
+            setTotalPages(res.totalPages);
         } catch (error) {
             console.error("Error fetching explore data:", error);
         } finally {
@@ -71,20 +67,15 @@ const ExplorePage = () => {
         }
     }, [endpoint, genreId, page, type]);
 
-    const handleScroll = useCallback(() => {
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 250 && page < totalPages && !loading && !loadingMore) {
-            setPage((prev) => prev + 1);
-        }
-    }, [page, totalPages, loading, loadingMore]);
+    const handleLoadNextPage = useCallback(() => {
+        setPage((prev) => prev + 1);
+    }, []);
+
+    useInfiniteScroll(handleLoadNextPage, page < totalPages, loading || loadingMore, 250);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
-
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [handleScroll]);
 
     return (
         <section className="container mx-auto min-h-[800px] md:min-h-screen pt-24 pb-16 px-4 max-w-7xl">

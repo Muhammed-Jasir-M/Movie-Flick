@@ -1,14 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import axiosInstance from '../services/axios';
+import tmdbApi from '../api/tmdbApi';
 import PosterCard from '../components/PosterCard';
 import Spinner from '../components/Spinner';
 import { PosterCardSkeleton } from '../components/SkeletonLoaders';
 import { MovieGenres, TvShowGenres } from '../constants/GenreList';
 import { getImageUrl } from '../constants/constants';
+import { SORT_OPTIONS } from '../constants/apiEndpoints';
+import useInfiniteScroll from '../hooks/useInfiniteScroll';
 
 const SearchPage = () => {
-    const [activeTab, setActiveTab] = useState('multi'); // multi, movie, tv, person
+    const [activeTab, setActiveTab] = useState('multi'); // multi, movie, tv, person, anime
     const [search, setSearch] = useState('');
     const [inputValue, setInputValue] = useState('');
     const [selectedGenre, setSelectedGenre] = useState('');
@@ -39,52 +41,39 @@ const SearchPage = () => {
         }
 
         try {
-            let response;
+            let res;
 
             if (activeTab === 'person') {
-                response = await axiosInstance.get('/search/person', {
-                    params: { query: search, page: page },
-                });
+                res = await tmdbApi.searchPerson(search, page);
             } else if (activeTab === 'anime') {
                 if (search.trim().length > 0) {
-                    response = await axiosInstance.get('/search/multi', {
-                        params: { query: search, page: page },
-                    });
+                    res = await tmdbApi.searchMulti(search, page);
                 } else {
-                    response = await axiosInstance.get('/discover/tv', {
-                        params: {
-                            with_genres: selectedGenre ? `${selectedGenre},16` : 16,
-                            sort_by: sortBy,
-                            page: page,
-                        },
+                    res = await tmdbApi.getTrendingAnime({
+                        genreId: selectedGenre ? `${selectedGenre},16` : 16,
+                        sortBy,
+                        page,
                     });
                 }
             } else if (selectedGenre && search.trim().length === 0) {
                 const mediaType = activeTab === 'multi' ? 'movie' : activeTab;
-                response = await axiosInstance.get(`/discover/${mediaType}`, {
-                    params: {
-                        with_genres: selectedGenre,
-                        sort_by: sortBy,
-                        page: page,
-                    },
+                res = await tmdbApi.getDiscoverMedia(mediaType, {
+                    with_genres: selectedGenre,
+                    sort_by: sortBy,
+                    page,
                 });
             } else {
-                response = await axiosInstance.get(`/search/${activeTab}`, {
-                    params: {
-                        query: search,
-                        page: page,
-                    },
-                });
+                res = await tmdbApi.searchByType(activeTab, search, page);
             }
 
-            let results = response.data.results || [];
+            let results = res.results || [];
 
             if (activeTab === 'multi' || activeTab === 'anime') {
                 results = results.filter((result) => result.media_type !== 'person');
             }
 
             if (activeTab === 'anime' && search.trim().length > 0) {
-                // Filter search results for animation genre id 16
+                // Filter search results for animation genre id 16 or 10759
                 results = results.filter((item) => item.genre_ids?.includes(16) || item.genre_ids?.includes(10759));
             }
 
@@ -94,7 +83,7 @@ const SearchPage = () => {
             }
 
             setMedias((prev) => (page === 1 ? results : [...prev, ...results]));
-            setTotalPages(response.data.total_pages || 0);
+            setTotalPages(res.totalPages || 0);
         } catch (error) {
             console.error('Error fetching search results:', error);
         } finally {
@@ -103,11 +92,11 @@ const SearchPage = () => {
         }
     }, [activeTab, page, search, selectedGenre, sortBy]);
 
-    const handleScroll = useCallback(() => {
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200 && page < totalPages && !loading && !loadingMore) {
-            setPage((prev) => prev + 1);
-        }
-    }, [page, totalPages, loading, loadingMore]);
+    const handleLoadNextPage = useCallback(() => {
+        setPage((prev) => prev + 1);
+    }, []);
+
+    useInfiniteScroll(handleLoadNextPage, page < totalPages, loading || loadingMore, 200);
 
     useEffect(() => {
         if (search.trim().length > 0 || selectedGenre) {
@@ -118,11 +107,6 @@ const SearchPage = () => {
             setTotalPages(0);
         }
     }, [search, selectedGenre, sortBy, activeTab, page, fetchData]);
-
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [handleScroll]);
 
     const handleSearch = (e) => {
         const value = e.target.value;
@@ -247,9 +231,11 @@ const SearchPage = () => {
                             onChange={handleSortChange}
                             className="bg-slate-800 text-white text-sm font-medium py-1.5 px-3 rounded-lg border border-gray-700 outline-none cursor-pointer focus:border-red-500"
                         >
-                            <option value="popularity.desc">Most Popular</option>
-                            <option value="vote_average.desc">Highest Rated</option>
-                            <option value="primary_release_date.desc">Release Date (Newest)</option>
+                            {SORT_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
                 )}
