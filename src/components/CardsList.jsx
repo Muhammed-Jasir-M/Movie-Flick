@@ -67,15 +67,15 @@ const CardsList = ({ endpoint, title, isTrending, type, genreId }) => {
     }
 
     return (
-        <section className='flex flex-col group'>
+        <section className='flex flex-col group px-2 sm:px-4 md:px-8 lg:px-12'>
             {data.length > 0 && (
-                <div className='flex justify-between items-center bg-[#14213d] py-2 px-1.5 sm:px-2 md:px-4 rounded-md my-3 mx-1 md:mx-3'>
+                <div className='flex justify-between items-center bg-[#14213d] py-2 px-3 sm:px-4 md:px-6 rounded-md my-3'>
                     <h2 className='text-[18px] sm:text-xl md:text-2xl font-semibold pt-3 mb-3 whitespace-nowrap'>
                         {title && title}
                     </h2>
 
                     <Link to={`/explore/${type || 'all'}/${title.toLowerCase().replace(/\s+/g, '-')}`} state={{endpoint, genreId}}>
-                        <h5 className='text-xs md:text-lg font-medium border-2 rounded-full px-1.5 py-1 md:px-2.5 md:py-1 cursor-pointer whitespace-nowrap hover:bg-white hover:text-black'>
+                        <h5 className='text-xs md:text-lg font-medium border-2 rounded-full px-2 py-1 md:px-3 md:py-1 cursor-pointer whitespace-nowrap hover:bg-white hover:text-black'>
                             View more
                         </h5>
                     </Link>
