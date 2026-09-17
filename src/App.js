@@ -19,6 +19,7 @@ import AboutPage from './pages/AboutPage'
 import Profile from './pages/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
 import WatchList from './pages/WatchList'
+import PersonDetails from './pages/PersonDetails'
 
 const App = () => {
     return (
@@ -32,6 +33,7 @@ const App = () => {
                     <Route path='/tv' element={<Tv />} />
                     <Route path='/search' element={<SearchPage />} />
                     <Route path='/:type/:id' element={<DetailsPage />} />
+                    <Route path='/person/:id' element={<PersonDetails />} />
                     <Route path='/player/:type/:id' element={<PlayerPage />} />
                     <Route path='/explore/:type/:title' element={<ExplorePage />} />
                     <Route path='/signup' element={<SignupPage />} />

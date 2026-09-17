@@ -8,6 +8,7 @@ A feature-rich web application built with **React**, **Tailwind CSS**, **Firebas
 
 - 🔐 **User Authentication**: Secure Login & Sign Up powered by Firebase Auth (with Formik & Yup validation).
 - 🍿 **Explore & Discover**: Browse trending, popular, top-rated movies and TV shows.
+- 👥 **Cast & Crew Profile**: Explore actor/director biographies, place of birth, age, and top filmography.
 - 🔍 **Search**: Fast real-time search functionality for titles, cast, and genres.
 - 🎬 **Trailer & Video Player**: Embedded media player for watching trailers directly on the site.
 - 🔖 **Watchlist**: Save your favorite movies and TV shows to view later.

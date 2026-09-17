@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import axiosInstance from '../services/axios';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getImageUrl } from '../constants/constants';
 import Spinner from './Spinner';
 
@@ -52,9 +52,10 @@ const CastList = () => {
                                 <div className='flex gap-2.5 overflow-x-auto scrollbar-hide pb-2 pt-1 px-1 mx-3'>
                                     {
                                         casts.map((cast, index) => (
-                                            <div
-                                                key={index}
-                                                className='relative h-[196px] min-w-[140px] max-w-[140px] cursor-pointer hover:scale-105 transition.all ease-in-out duration-300'
+                                            <Link
+                                                to={`/person/${cast?.id}`}
+                                                key={`${cast?.id}-${index}`}
+                                                className='relative h-[196px] min-w-[140px] max-w-[140px] cursor-pointer hover:scale-105 transition-all ease-in-out duration-300'
                                             >
                                                 {
                                                     cast?.profile_path ? (
@@ -64,7 +65,7 @@ const CastList = () => {
                                                             className='h-[160px] w-full rounded-t-md object-cover bg-[#14213d]'
                                                         />
                                                     ) : (
-                                                        <div className={`h-[160px] w-full flex justify-center items-center bg-[#14213d] rounded-t-md shadow-md`}>
+                                                        <div className={`h-[160px] w-full flex justify-center items-center bg-[#14213d] rounded-t-md shadow-md text-xs text-center text-gray-400 px-1`}>
                                                             No Image found
                                                         </div>
                                                     )
@@ -75,11 +76,11 @@ const CastList = () => {
                                                         {cast?.name}
                                                     </h3>
 
-                                                    <p className='text-xs font-medium line-clamp-1 text-ellipsis text-center'>
+                                                    <p className='text-xs font-medium line-clamp-1 text-ellipsis text-center text-gray-300'>
                                                         {cast?.character}
                                                     </p>
                                                 </div>
-                                            </div>
+                                            </Link>
                                         ))
                                     }
                                 </div>
@@ -95,9 +96,10 @@ const CastList = () => {
                                 <div className='flex gap-2.5 overflow-x-auto scrollbar-hide pt-2 px-1 mx-3 pb-2'>
                                     {
                                         crews.map((crew, index) => (
-                                            <div
-                                                key={index}
-                                                className='h-[196px] min-w-[140px] max-w-[140px] cursor-pointer hover:scale-105 transition.all ease-in-out duration-300'
+                                            <Link
+                                                to={`/person/${crew?.id}`}
+                                                key={`${crew?.id}-${index}`}
+                                                className='h-[196px] min-w-[140px] max-w-[140px] cursor-pointer hover:scale-105 transition-all ease-in-out duration-300'
                                             >
                                                 {
                                                     crew?.profile_path ? (
@@ -107,22 +109,22 @@ const CastList = () => {
                                                             className='h-[160px] w-full rounded-t-md object-cover bg-[#14213d]'
                                                         />
                                                     ) : (
-                                                        <div className={`h-[160px] w-full flex justify-center items-center bg-[#14213d] rounded-t-md shadow-md`}>
+                                                        <div className={`h-[160px] w-full flex justify-center items-center bg-[#14213d] rounded-t-md shadow-md text-xs text-center text-gray-400 px-1`}>
                                                             No Image found
                                                         </div>
                                                     )
                                                 }
 
-                                                <div className='bg-black/70 w-full rounded-b-md h-9'>
+                                                <div className='bg-black/70 w-full rounded-b-md h-9 px-1'>
                                                     <h3 className='text-sm font-semibold text-ellipsis line-clamp-1 text-center'>
                                                         {crew?.name}
                                                     </h3>
 
-                                                    <p className='text-xs font-medium line-clamp-1 text-ellipsis text-center'>
+                                                    <p className='text-xs font-medium line-clamp-1 text-ellipsis text-center text-gray-300'>
                                                         {crew?.job}
                                                     </p>
                                                 </div>
-                                            </div>
+                                            </Link>
 
                                         ))
                                     }
