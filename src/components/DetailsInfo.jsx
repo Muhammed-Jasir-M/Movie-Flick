@@ -135,11 +135,11 @@ const DetailsInfo = () => {
                                     watchlistLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
                                 } ${
                                     isInWatchlist
-                                        ? 'bg-red-600/20 text-red-400 border-red-500/40 hover:bg-red-600/30'
+                                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30'
                                         : 'bg-slate-800/80 hover:bg-slate-700 text-gray-200 border-gray-700'
                                 }`}
                             >
-                                {isInWatchlist ? <FaBookmark className="text-red-500" /> : <FaRegBookmark />}
+                                {isInWatchlist ? <FaBookmark className="text-amber-400" /> : <FaRegBookmark />}
                                 <span>{isInWatchlist ? 'In Watchlist' : 'Add to Watchlist'}</span>
                             </button>
                         </div>

@@ -12,6 +12,7 @@ const PersonDetails = () => {
     const [credits, setCredits] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isBioExpanded, setIsBioExpanded] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(12);
 
     const fetchPersonDetails = useCallback(async () => {
         setLoading(true);
@@ -35,6 +36,17 @@ const PersonDetails = () => {
             setLoading(false);
         }
     }, [id]);
+
+    const handleScroll = useCallback(() => {
+        if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 400) && visibleCount < credits.length) {
+            setVisibleCount(prev => Math.min(prev + 10, credits.length));
+        }
+    }, [visibleCount, credits.length]);
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [handleScroll]);
 
     useEffect(() => {
         fetchPersonDetails();
@@ -63,55 +75,55 @@ const PersonDetails = () => {
     return (
         <section className="container mx-auto min-h-screen pt-24 pb-12 px-4 md:px-8 text-white">
             <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center md:items-start">
-                {/* Profile Image & Quick Facts */}
-                <div className="flex flex-col items-center min-w-[260px] max-w-[280px] w-full">
+                {/* Profile Image & Quick Facts (Sticky on Desktop) */}
+                <div className="flex flex-col items-center min-w-[260px] max-w-[280px] w-full md:sticky md:top-24 flex-shrink-0">
                     {person.profile_path ? (
                         <img
                             src={getImageUrl('w500', person.profile_path)}
                             alt={person.name}
-                            className="w-full h-[380px] object-cover rounded-xl shadow-2xl border border-gray-800"
+                            className="w-full h-[380px] object-cover rounded-2xl shadow-2xl border border-gray-800"
                         />
                     ) : (
-                        <div className="w-full h-[380px] bg-[#14213d] rounded-xl flex items-center justify-center text-gray-400">
+                        <div className="w-full h-[380px] bg-[#14213d] rounded-2xl flex items-center justify-center text-gray-400">
                             No Profile Image
                         </div>
                     )}
 
-                    <div className="w-full mt-6 bg-[#14213d] p-5 rounded-xl flex flex-col gap-3 shadow-md border border-gray-800/50">
-                        <h3 className="text-lg font-bold border-b border-gray-700 pb-2 text-red-500">Personal Info</h3>
+                    <div className="w-full mt-6 bg-[#14213d]/80 backdrop-blur-md p-5 rounded-2xl flex flex-col gap-3.5 shadow-xl border border-gray-800/80">
+                        <h3 className="text-lg font-bold border-b border-gray-800 pb-2 text-red-500 tracking-wide">Personal Info</h3>
                         
                         <div>
-                            <span className="text-sm text-gray-400 font-medium block">Known For</span>
-                            <span className="text-base font-semibold">{person.known_for_department || 'N/A'}</span>
+                            <span className="text-xs text-gray-400 font-medium block">Known For</span>
+                            <span className="text-sm font-semibold text-gray-100">{person.known_for_department || 'N/A'}</span>
                         </div>
 
                         {person.gender > 0 && (
                             <div>
-                                <span className="text-sm text-gray-400 font-medium block">Gender</span>
-                                <span className="text-base font-semibold">{person.gender === 1 ? 'Female' : 'Male'}</span>
+                                <span className="text-xs text-gray-400 font-medium block">Gender</span>
+                                <span className="text-sm font-semibold text-gray-100">{person.gender === 1 ? 'Female' : 'Male'}</span>
                             </div>
                         )}
 
                         {person.birthday && (
                             <div>
-                                <span className="text-sm text-gray-400 font-medium block">Birthday</span>
-                                <span className="text-base font-semibold">
-                                    {moment(person.birthday).format('MMM DD, YYYY')} {age !== null && `(${age} years old)`}
+                                <span className="text-xs text-gray-400 font-medium block">Birthday</span>
+                                <span className="text-sm font-semibold text-gray-100">
+                                    {moment(person.birthday).format('MMM DD, YYYY')} {age !== null && `(${age} yrs)`}
                                 </span>
                             </div>
                         )}
 
                         {person.place_of_birth && (
                             <div>
-                                <span className="text-sm text-gray-400 font-medium block">Place of Birth</span>
-                                <span className="text-base font-semibold">{person.place_of_birth}</span>
+                                <span className="text-xs text-gray-400 font-medium block">Place of Birth</span>
+                                <span className="text-sm font-semibold text-gray-100">{person.place_of_birth}</span>
                             </div>
                         )}
                     </div>
                 </div>
 
                 {/* Biography & Filmography */}
-                <div className="flex-1 flex flex-col gap-6 w-full">
+                <div className="flex-1 flex flex-col gap-6 w-full min-w-0">
                     <div>
                         <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-2">{person.name}</h1>
                         {person.also_known_as?.length > 0 && (
@@ -130,7 +142,7 @@ const PersonDetails = () => {
                             {person.biography.length > 400 && (
                                 <button
                                     onClick={() => setIsBioExpanded(!isBioExpanded)}
-                                    className="mt-3 text-red-500 hover:text-red-400 font-semibold text-sm focus:outline-none"
+                                    className="mt-3 text-red-500 hover:text-red-400 font-semibold text-sm focus:outline-none cursor-pointer"
                                 >
                                     {isBioExpanded ? 'Show Less' : 'Read More'}
                                 </button>
@@ -140,20 +152,34 @@ const PersonDetails = () => {
 
                     {/* Known For / Filmography */}
                     <div className="mt-4">
-                        <h2 className="text-2xl font-bold mb-4">Known For</h2>
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-2xl font-bold">Known For</h2>
+                            <span className="text-xs font-semibold bg-red-600/20 text-red-400 px-3 py-1 rounded-full">
+                                {credits.length} Titles
+                            </span>
+                        </div>
+
                         {credits.length > 0 ? (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                                {credits.slice(0, 15).map((item, index) => (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 w-full">
+                                {credits.slice(0, visibleCount).map((item, index) => (
                                     <PosterCard
                                         key={`${item.id}-${index}`}
                                         data={item}
                                         type={item.media_type || 'movie'}
-                                        isSmall
+                                        isGrid
                                     />
                                 ))}
                             </div>
                         ) : (
                             <p className="text-gray-400">No known filmography available.</p>
+                        )}
+
+                        {visibleCount < credits.length && (
+                            <div className="text-center mt-6">
+                                <span className="text-xs text-gray-400">
+                                    Showing {visibleCount} of {credits.length} titles (scroll for more)
+                                </span>
+                            </div>
                         )}
                     </div>
                 </div>

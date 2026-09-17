@@ -7,7 +7,7 @@ import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import { useWatchlistContext } from '../store/watchlistContext';
 import { useAuthContext } from '../store/authContext';
 
-const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist }) => {
+const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist, isGrid }) => {
     const { user } = useAuthContext();
     const { addToWatchlist, removeFromWatchlist, fetchWatchlist } = useWatchlistContext();
     const [inWatchlist, setInWatchlist] = useState(false);
@@ -40,38 +40,52 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist }) => 
             return;
         }
 
+        const nextState = !(inWatchlist || isWatchlist);
+        setInWatchlist(nextState); // Optimistic instant UI update
         setActionLoading(true);
+
         try {
-            if (inWatchlist || isWatchlist) {
+            if (!nextState) {
                 await removeFromWatchlist(user.uid, data, mediaType);
-                setInWatchlist(false);
                 toast.success('Removed from watchlist');
             } else {
                 await addToWatchlist(user.uid, data, mediaType);
-                setInWatchlist(true);
                 toast.success('Added to watchlist');
             }
         } catch (error) {
+            setInWatchlist(!nextState); // Revert on error
             toast.error('Failed to update watchlist');
         } finally {
             setActionLoading(false);
         }
     };
 
+    const widthClasses = isGrid
+        ? 'w-full h-full min-h-[240px] sm:min-h-[290px]'
+        : isSmall
+        ? 'min-w-[150px] max-w-[150px] h-[230px] sm:min-w-[190px] sm:max-w-[190px] sm:h-[290px] md:min-w-[210px] md:max-w-[210px] md:h-[320px]'
+        : 'min-w-[210px] max-w-[210px] h-[320px]';
+
+    const imgHeightClasses = isGrid
+        ? 'aspect-[2/3] w-full'
+        : isSmall
+        ? 'h-[175px] sm:h-[230px] md:h-[260px]'
+        : 'h-[260px]';
+
     return (
-        <Link to={`/${mediaType}/${data?.id}`}>
-            <div className={`group/card relative ${isSmall ? 'min-w-[150px] max-w-[150px] h-[230px] sm:min-w-[190px] sm:max-w-[190px] sm:h-[290px] md:min-w-[210px] md:max-w-[210px] md:h-[320px]' : 'min-w-[210px] max-w-[210px] h-[320px]'} cursor-pointer rounded-xl hover:scale-105 transition-all duration-300 ease-in-out border border-transparent hover:border-gray-700 shadow-lg overflow-hidden bg-[#14213d]`}>
+        <Link to={`/${mediaType}/${data?.id}`} className={isGrid ? 'w-full' : ''}>
+            <div className={`group/card relative ${widthClasses} cursor-pointer rounded-xl hover:scale-105 transition-all duration-300 ease-in-out border border-transparent hover:border-gray-700 shadow-lg overflow-hidden bg-[#14213d] flex flex-col justify-between`}>
                 
                 {/* Poster Image */}
                 {data?.poster_path ? (
                     <img
                         src={getImageUrl('w500', data?.poster_path)}
                         alt={data?.title || data?.name || 'movie-poster'}
-                        className={`${isSmall ? 'h-[175px] sm:h-[230px] md:h-[260px]' : 'h-[260px]'} w-full object-cover rounded-t-xl bg-[#14213d]`}
+                        className={`${imgHeightClasses} w-full object-cover rounded-t-xl bg-[#14213d]`}
                         loading="lazy"
                     />
                 ) : (
-                    <div className={`${isSmall ? 'h-[175px] sm:h-[230px] md:h-[260px]' : 'h-[260px]'} w-full flex justify-center items-center bg-[#14213d] rounded-t-xl text-xs text-gray-400 text-center px-2`}>
+                    <div className={`${imgHeightClasses} w-full flex justify-center items-center bg-[#14213d] rounded-t-xl text-xs text-gray-400 text-center px-2`}>
                         No Image found
                     </div>
                 )}
@@ -109,11 +123,11 @@ const PosterCard = ({ data, isTrending, index, type, isSmall, isWatchlist }) => 
                     title={inWatchlist || isWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
                     className={`absolute top-2.5 right-2.5 p-2 rounded-full backdrop-blur-md transition-all duration-200 z-10 cursor-pointer shadow-md ${
                         inWatchlist || isWatchlist
-                            ? 'bg-red-600 text-white opacity-100 scale-100'
-                            : 'bg-black/60 hover:bg-red-600 text-white opacity-0 group-hover/card:opacity-100 scale-95 hover:scale-110'
+                            ? 'bg-slate-900/95 text-amber-400 border border-amber-400/50 opacity-100 scale-100'
+                            : 'bg-black/60 hover:bg-slate-800 text-white opacity-0 group-hover/card:opacity-100 scale-95 hover:scale-110'
                     }`}
                 >
-                    {inWatchlist || isWatchlist ? <FaBookmark size={13} /> : <FaRegBookmark size={13} />}
+                    {inWatchlist || isWatchlist ? <FaBookmark size={13} className="text-amber-400" /> : <FaRegBookmark size={13} />}
                 </button>
             </div>
         </Link>
