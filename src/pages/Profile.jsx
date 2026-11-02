@@ -68,7 +68,7 @@ const Profile = () => {
     };
 
     return (
-        <section className="pt-24 pb-12 min-h-screen flex flex-col items-center px-4 bg-gradient-to-b from-[#0a1128] via-[#0f172a] to-[#0a1128]">
+        <section className="pt-24 pb-12 min-h-screen flex flex-col items-center px-4 bg-[#0f172a]">
             <div className="w-full max-w-lg bg-[#14213d]/80 backdrop-blur-md p-8 rounded-2xl border border-gray-800 shadow-2xl mt-4">
                 <h1 className="text-3xl font-extrabold text-white text-center mb-6">Account Profile</h1>
 

@@ -53,7 +53,7 @@ const SignupPage = () => {
     });
 
     return (
-        <section className="min-h-screen pt-24 pb-12 flex justify-center items-center px-4 bg-gradient-to-b from-[#0a1128] via-[#0f172a] to-[#0a1128]">
+        <section className="min-h-screen pt-24 pb-12 flex justify-center items-center px-4 bg-[#0f172a]">
             <form
                 className="flex flex-col w-full max-w-lg bg-[#14213d]/80 backdrop-blur-md p-8 md:p-10 rounded-2xl border border-gray-800 shadow-2xl my-6"
                 onSubmit={handleSubmit}

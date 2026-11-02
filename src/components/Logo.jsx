@@ -7,7 +7,7 @@ const Logo = ({ size = 'md', className = '' }) => {
     return (
         <div className={`flex items-center gap-2.5 group cursor-pointer ${className}`}>
             {/* Logo Badge Icon */}
-            <div className={`relative flex items-center justify-center rounded-xl bg-gradient-to-tr from-red-700 via-red-600 to-red-500 shadow-lg shadow-red-600/30 group-hover:scale-105 group-hover:shadow-red-600/50 transition-all duration-300 ${
+            <div className={`relative flex items-center justify-center rounded-xl bg-red-600 group-hover:bg-red-700 transition-colors duration-200 ${
                 isSmall ? 'w-8 h-8' : isLarge ? 'w-11 h-11' : 'w-9.5 h-9.5'
             }`}>
                 {/* Film Reel / Play Icon */}
@@ -17,8 +17,6 @@ const Logo = ({ size = 'md', className = '' }) => {
                 >
                     <path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2zM10 9.5v5l5-2.5-5-2.5z" />
                 </svg>
-                {/* Glowing ring */}
-                <div className="absolute inset-0 rounded-xl border border-white/20 pointer-events-none" />
             </div>
 
             {/* Brand Title */}

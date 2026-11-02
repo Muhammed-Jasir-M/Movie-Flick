@@ -46,12 +46,11 @@ const Header = () => {
     return (
         <header className={`
                 fixed top-0 max-w-[1536px] w-full z-50 py-3 sm:py-3.5 px-4 sm:px-6 text-white transition-colors duration-300 border-b
-                ${scrolled ? 'bg-[#0f172a]/95 backdrop-blur-md shadow-2xl border-gray-800/80' : 'bg-gradient-to-b from-[#0f172a]/95 via-[#0f172a]/60 to-transparent border-transparent'}
+                ${scrolled ? 'bg-[#0f172a]/95 backdrop-blur-md shadow-lg border-gray-800' : 'bg-transparent border-transparent'}
             `}
         >
             <div className='w-full flex gap-4 justify-between items-center max-w-7xl mx-auto'>
-                {/* Logo links to Landing Page */}
-                <Link to='/landing' title="Movie Flick Landing">
+                <Link to='/' title="Movie Flick">
                     <Logo />
                 </Link>
 

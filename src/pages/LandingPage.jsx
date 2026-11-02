@@ -3,21 +3,18 @@ import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
     return (
-        <div className="w-full min-h-screen text-white bg-[#0f172a] relative overflow-hidden">
-            {/* Background Decorative Ambient Lights */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-red-600/20 via-indigo-600/10 to-transparent blur-[140px] pointer-events-none -z-10" />
-
+        <div className="w-full min-h-screen text-white bg-[#0f172a] relative">
             {/* Hero Intro Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 md:pt-32 pb-16 md:pb-24 text-center relative z-10">
                 {/* Intro Badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-600/10 border border-red-500/30 text-red-400 text-xs sm:text-sm font-bold mb-8 shadow-inner animate-pulse">
-                    <span>🎬</span> Welcome to Movie Flick
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800 border border-gray-700 text-gray-300 text-xs sm:text-sm font-medium mb-8">
+                    Welcome to Movie Flick
                 </div>
 
                 {/* Hero Title */}
                 <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight leading-[1.1] text-white mb-6 max-w-5xl mx-auto">
                     The Ultimate Portal for <br className="hidden sm:inline" />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-amber-400 to-red-600">
+                    <span className="text-red-500">
                         Movies, TV Shows & Actors
                     </span>
                 </h1>
@@ -31,7 +28,7 @@ const LandingPage = () => {
                 <div className="flex flex-wrap items-center justify-center gap-4">
                     <Link
                         to="/"
-                        className="px-8 py-4 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-base shadow-xl hover:shadow-red-600/40 transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
+                        className="px-8 py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-base transition-colors flex items-center gap-2 shadow-lg"
                     >
                         <span>Start Browsing Now</span>
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,7 +126,7 @@ const LandingPage = () => {
 
             {/* Bottom Call to Action Section */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div className="bg-gradient-to-r from-red-900/40 via-red-600/20 to-amber-900/40 border border-red-500/30 p-10 sm:p-16 rounded-3xl text-center shadow-2xl relative overflow-hidden">
+                <div className="bg-[#14213d] border border-gray-800 p-10 sm:p-16 rounded-2xl text-center shadow-xl">
                     <h2 className="text-3xl sm:text-5xl font-black text-white mb-4">
                         Ready to Experience Movie Flick?
                     </h2>

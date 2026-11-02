@@ -28,7 +28,7 @@ const Footer = () => {
         <footer className='relative bg-slate-900 text-[#ffffff] pt-6 md:pt-8 pb-[85px] sm:pb-5 md:pb-8 px-4 sm:px-6 md:px-12 lg:px-16 rounded-t-md border-t border-gray-800'>
             <div className='flex flex-col md:flex-row justify-between gap-6'>
                 <div className='flex flex-col gap-3 w-full items-center md:items-start'>
-                    <Link to='/landing'>
+                    <Link to='/' title="Movie Flick">
                         <Logo size="lg" />
                     </Link>
 
